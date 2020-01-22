@@ -1,0 +1,270 @@
+```{r Global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=6, echo=FALSE, warning=FALSE, message=FALSE)
+
+Sys.setenv(LANG = "en")
+library(ggplot2)
+library(scales)
+library(epiR)
+library(ggthemes)
+library(RColorBrewer)
+library(plyr)
+library(reshape2)
+library(pROC)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(plotROC)
+library(flextable)
+library(DataExplorer)
+
+# as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
+```
+
+### Load
+```{r Load Data}
+Master_df <- read.table(file = "Master_60K_OpenMRS_08_11_2018.csv", header=T, sep=",")
+Master_df$Result.Date <- mdy(Master_df$Radiology.Result.Date)
+Master_df$Result.Year <- quarter(Master_df$Result.Date, with_year = TRUE)
+# knitr::kable(data.frame(table(Master_df$Result.Year)))
+
+### Image Received ###
+ReceviedIndex <- read.csv(file = "Image index received.csv")
+colnames(ReceviedIndex)[1] <- "TID"
+ReceviedIndex$TID <- as.character(ReceviedIndex$TID)
+
+ReceviedIndex$FileFolder <- paste(ReceviedIndex$TID, ReceviedIndex$Folder, sep = "_")
+
+### Load CAD6 #####
+CAD6_delft <- read.table(file = "CAD_delft_2018.csv", sep = ",", header = T, fill = T) # need to be updated. New results recevied from Rick.
+glimpse(CAD6_delft)
+colnames(CAD6_delft)[7] <- "TID_Delft"
+CAD6_delft <- CAD6_delft[, -2]
+glimpse(CAD6_delft)
+
+### Load Qure.AI #####
+QA.BGD <- read.csv(file = "./QureAI Score/qXRv2.csv", header=T, sep=",")
+# colnames(QA.BGD)[1] <- "TID"
+
+```
+  
+###  Recode  
+
+```{r Recode}
+Master_df <- Master_df %>%
+filter(Result.Date < as.Date("2017-01-01"))
+
+# Referece: Xpert (at least 1 of 2 Xpert is positive) #This is changed, only 1 Xpert result is used. 
+Master_df$Xpert2Outcome_num [Master_df$GXP.Result %in% "MTB Detected"] <- 1
+Master_df$Xpert2Outcome_num [Master_df$GXP.Result %in% "MTB Not Detected"] <- 0
+Master_df$Xpert2Outcome_num <- as.numeric(Master_df$Xpert2Outcome_num)
+comment(Master_df$Xpert2Outcome_num) <- "1/0 binary code. 1400 without Xpert results, 1 invalid Xpert"
+Master_df <- Master_df[!is.na(Master_df$Xpert2Outcome_num), ]
+
+
+#### Radiologist Reading Dic ####
+Master_df$radiology_dic [Master_df$Radiology.Result == "Highly TB Suggestive" | Master_df$Radiology.Result =="TB Possible Signs"] <- "Ragiologist: Abnormal"
+Master_df$radiology_dic [Master_df$Radiology.Result == "Non-TB Abnormality" | Master_df$Radiology.Result =="X- Ray Normal"] <- "Ragiologist: Normal"
+
+# Highly TB Suggestive 
+Master_df$raiolgogy_highly[Master_df$Radiology.Result == "Highly TB Suggestive"] <- "1"
+Master_df$raiolgogy_highly[Master_df$Radiology.Result != "Highly TB Suggestive"] <- "0"
+Master_df$raiolgogy_highly <- as.factor(Master_df$raiolgogy_highly)
+
+# Highly TB Suggestive + TB Possible Signs
+Master_df$raiolgogy_possible[Master_df$Radiology.Result == "Highly TB Suggestive" | Master_df$Radiology.Result == "TB Possible Signs"] <- "1"
+Master_df$raiolgogy_possible[is.na(Master_df$raiolgogy_possible)==T] <- "0"
+Master_df$raiolgogy_possible <- as.factor(Master_df$raiolgogy_possible)
+
+# Any abnormality
+Master_df$any_abnormality[Master_df$Radiology.Result == "Highly TB Suggestive" | Master_df$Radiology.Result == "TB Possible Signs" | Master_df$Radiology.Result == "Non-TB Abnormality"] <- "1"
+Master_df$any_abnormality[is.na(Master_df$any_abnormality)==T] <- "0"
+Master_df$any_abnormality <- as.factor(Master_df$any_abnormality)
+
+#### Referal Unit
+# Master_df$type[Master_df$Refferal.Unit =="CS"|Master_df$Refferal.Unit =="cs"|Master_df$Refferal.Unit =="CS " | Master_df$Refferal.Unit =="PP"| Master_df$Refferal.Unit =="pp"| Master_df$Refferal.Unit =="Pp"] <- "Private Provider"
+# Master_df$type[Master_df$Refferal.Unit =="DOTS"|Master_df$Refferal.Unit =="Dots"|Master_df$Refferal.Unit =="DOTs"] <- "Public DOTS Facilities"
+# Master_df$type[Master_df$Refferal.Unit =="Self"|Master_df$Refferal.Unit =="SELF"|Master_df$Refferal.Unit =="SElF"|Master_df$Refferal.Unit =="Self "|Master_df$Refferal.Unit =="self"] <- "Walk-in"
+# Master_df$type <- as.factor(Master_df$type)
+
+# ggplot(Master_df, aes(Age, fill=Gender)) + geom_histogram(binwidth = 1)
+
+Master_df$PTID <- paste(Master_df$PID_OMRS, Master_df$TID_OMRS, sep = "_")
+
+
+# File Received
+ReceviedIndex$Center <- 0 
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "1st Batch\\Dhanmondi_TBSTC"] <- "Dhanmondi"
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "1st Batch\\Golapbagh_TBSTC"] <- "Golapbagh"
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "1st Batch\\Mohakhali_TBSTC"] <- "Mohakhali"
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "2nd Batch\\Dhanmondi2"] <- "Dhanmondi"
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "2nd Batch\\Golapbagh2"] <- "Golapbagh"
+ReceviedIndex$Center[ReceviedIndex$Folder %in% "2nd Batch\\Mohakhali2"] <- "Mohakhali"
+
+```
+  
+###  Clean MasterDF 
+
+```{r Cleaning Master DF}
+##### Master DF:: Duplicated PID (just 1) ############ 
+n_occur <- data.frame(table(Master_df$PID_OMRS))
+n_occur[n_occur$Freq > 1,] # The repeated ID is 201150400036-0
+Master_df <- (Master_df[Master_df$PID_OMRS %in% n_occur$Var1[n_occur$Freq < 2], ]) # execute to remove the duplicated PID
+rm(n_occur)
+
+##### Master DF:: Duplicated TID ##### --> Sorted
+n_occur <- data.frame(table(Master_df$TID_OMRS))
+n_occur[n_occur$Freq > 1,] # Execute to view the duplicated TID
+MultiTID_M <- (Master_df[Master_df$TID_OMRS %in% n_occur$Var1[n_occur$Freq >1], ]) # execute to subset a df of the records that have duplicated TID (n=942)
+# Master_df <- (Master_df[Master_df$TID_OMRS %in% n_occur$Var1[n_occur$Freq <2], ]) # execute to remove the duplicated TIDs from Master DF. Cautions  
+rm(n_occur)
+
+# keep only the record with the same TID but a different age & gender
+Master_df <- Master_df[!duplicated(Master_df[c("Age", "Gender", "TID_OMRS")]), ]
+```
+
+###  Clean Delft 
+
+```{r Cleaning Delft}
+names(CAD6_delft)
+###### Delft DF:: Wrong TID (n = 891) #### --> Remove
+WrongDelftTID <- CAD6_delft[-grep("^.{12}$",CAD6_delft$TID_Delft)]
+# summary(WrongDelftTID$TID_Delft)
+WrongDelftTID <- WrongDelftTID[WrongDelftTID$CAD4TB6 != "-1", ] # 607 Left to be manuual corrected!!! No i refuse. Let's look at those that hvae less than 11 digits --> which means i can't possiblily trace the true identity
+# I want to remove all with less than 11 digits
+WrongDelftTID <- WrongDelftTID[-grep(pattern="^.{1,10}$", WrongDelftTID$TID_Delft), ] # 423 Left
+# Those with EXACTLY 11 digits, I will add a - before the last digit
+WrongDelftTID$TID_Delft[grep(pattern="^[[:digit:]]{11}$", WrongDelftTID$TID_Delft)] 
+sub("(.{10})(.*)", "\\1-\\2", CAD6_delft$TID_Delft[grep(pattern="^[[:digit:]]{11}$", CAD6_delft$TID_Delft)])
+# Find the 11-digit ones that is not pure numeric and exclude them. 
+
+# Find the 13-digit ones with non-numeric beginning and remove the beginning
+
+###  Manual Correction of not really wrong TIDs. 
+CAD6_delft$TID_Delft[CAD6_delft$TID_Delft %in% "@2030100762-9"] <- "2030100762-9"
+# ... ... many more to go... 
+# But it is not worth it to correct the TID, hence all exclude. 
+CAD6_delft <- CAD6_delft[grep("^.{12}$",CAD6_delft$TID_Delft), ]
+
+
+###### Delft DF:: Duplication of TID (unique TID from Delft that don't have different CAD6 score=26051) #### --> sort of resolved
+# (length(CAD6_delft$TID_Delft)- length(unique(CAD6_delft$TID_Delft))) # Comment out to hide the results. Result is # duplicated TIDs = 5992
+n_occur <- data.frame(table(CAD6_delft$TID_Delft))
+table(n_occur$Freq)
+
+DupDelftTID <- CAD6_delft[CAD6_delft$TID_Delft %in% n_occur$Var1[n_occur$Freq > 1], ] 
+rm(n_occur, DupDelftTID)
+length(unique(CAD6_delft$TID_Delft))
+
+# Removed Duplciated TID with the same CAD6 scores --> 27908 (26051 has truely 1 unique TID & CAD6 scores)
+DeDuDelft_Compt <-CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TB6")]), ]
+n_occur <- data.frame(table(DeDuDelft_Compt$TID_Delft))
+table(n_occur$Freq) 
+# View(DeDuDelft_Compt[DeDuDelft_Compt$TID_Delft %in% n_occur$Var1[n_occur$Freq > 1], c(1, 6,10)] ) # To view the duplciated TID: CAD6 score differ
+# -> I decided to discard all records with the same TID but different CAD6 (due to inability to trace the true identify of them). 1857 are dumped. 
+
+# A df with just unique TID from Delft that don't have different CAD6 score --> 26051
+DeDuDelft_TID <- DeDuDelft_Compt[DeDuDelft_Compt$TID_Delft %in% n_occur$Var1[n_occur$Freq == 1], ] 
+rm(n_occur)
+```
+  
+There are `r length(WrongDelftTID$Filename)` rows in Delft's results that have a TID mismatching the format (9digit-1digit). I removed the `r length(WrongDelftTID$Filename)` rows.  
+There are 11120 duplicated TIDs, so the total of unique TID from delft is only 27668 For the timebeing, I have 2 deduplicated Delft sets, one is with unique TID only, the other taken into consitiaotn of patient.BD, CAD4TB score. The hope is maybe we can use the extra information to identify the inital PID. This imply we will need  QA to report these tags from the DICOM meta data. The challenge will be link CAD results with the master dataframe from icddr,b openMRS. 
+
+
+### Clean QA.BGD
+```{r}
+summary(QA.BGD)
+# in master but not in QA.BGD
+Missing <- subset(Master_df, !(Master_df$TID_OMRS %in% QA.BGD$TID))
+
+# write.csv(Missing, "Missing.csv")
+```
+
+
+### Clean Image Received
+```{r Cleaning Image Received}
+rm(WrongDelftTID)
+
+##### Image Received:: Duplicated TID ##### --> Solved
+n_occur <- data.frame(table(ReceviedIndex$TID))
+Multi_TID_Received <- (ReceviedIndex[ReceviedIndex$TID %in% n_occur$Var1[n_occur$Freq >1], ]) 
+# Remove the duplicated records from the 2nd Batch
+Uni1Batch <- Multi_TID_Received[!duplicated(Multi_TID_Received[c("TID", "Center")]), ]
+TID_2ndBatch_Remove <- subset(Multi_TID_Received, !(Multi_TID_Received$FileFolder %in% Uni1Batch$FileFolder))
+write.csv(TID_2ndBatch_Remove, "TID_2ndBatch_Remove.csv")
+
+ReceviedIndex <- ReceviedIndex[!duplicated(ReceviedIndex["TID"]), ]
+
+rm(n_occur, TID_2ndBatch_Remove, Multi_TID_Received, Uni1Batch)
+```
+  
+###  Merge 
+```{r DF merge}
+## Image Received:: Images received but NOT exist in MasterDF ### --> Get rid of them (n=2434)
+# NotinMDF<-subset(ReceviedIndex, !(ReceviedIndex$TID %in% Master_df$TID_OMRS)) # Those are images recevied but not in the MasterDF
+ReceviedIndex <- subset(ReceviedIndex, (ReceviedIndex$TID %in% Master_df$TID_OMRS))
+##Image Not Received/Found:: Images  received but exist in MasterDF #### --> 823. also dump because 819 of them also don't have a delft score. Maybethey were never taken)
+NotReceived<-subset(Master_df, !(Master_df$TID_OMRS %in% ReceviedIndex$TID))
+rm(NotReceived)
+
+### MERGE Image Recevied with MasterDF -> MDF ###### 
+# n=30403
+MDF <- merge(Master_df, ReceviedIndex, by.x = "TID_OMRS", by.y = "TID")
+
+##### in newly merged MDF not no Delft reading #### --> 6015 (Maybe we get them read by Deflt)
+NoDelft<-subset(MDF, !(MDF$TID_OMRS %in% DeDuDelft_TID$TID_Delft))
+
+### MERGE MDF with Delft -> MDF_Delft ###### 
+# n = 24388
+MDF_Delft <- merge(MDF, DeDuDelft_TID, by.x = "TID_OMRS", by.y = "TID_Delft")
+
+MDF_Delft_QA <- merge(MDF_Delft, QA.BGD, by.x = "TID_OMRS", by.y = "TID")
+
+# subset(MDF_Delft, MDF_Delft$TID_OMRS %in% QA.BGD$TID)
+
+# rm(Master_df, MDF)
+table(MDF$Result.Year)
+table(MDF_Delft$Result.Year) # Delft misses images mostly in the last 2 quarters in 2016. 
+```
+
+### Duplicated TID in MDF_Delft_QA
+```{r Duplicated TID in MDF_Delft_QA}
+n_occur <- data.frame(table(MDF_Delft_QA$TID_OMRS))
+table(n_occur$Freq)
+DuTID_MDF <- (MDF_Delft_QA[MDF_Delft_QA$TID_OMRS %in% n_occur$Var1[n_occur$Freq >1], ])
+# Do they have unique tag which can use to distinguish them? 
+# Result.Date? 
+n_occur <- data.frame(table(DuTID_MDF[!duplicated(DuTID_MDF[c("TID_OMRS", "Result.Date")]), 1]))
+table(n_occur$Freq) # enrollment date is NOT helpful. 78paris with the same TID have the same Date
+
+# Age + Result.Date?
+n_occur <- data.frame(table(DuTID_MDF[!duplicated(DuTID_MDF[c("TID_OMRS", "Result.Date", "Age")]), 1]))
+table(n_occur$Freq) # Age & Result.date combined seems to help. only 2 paris with the same TID cannot be distinguish from Date&Age combined
+```
+  
+Solution: keep the MDF  (if we can get delft to read them) or MDF_Delft set (24388 records) as it is, but this set only contains 24284 unique images. That means we need to extract "StudyDate" & "PatientAge" from the metadata from delft.  
+
+
+### Subset 
+```{r Subset}
+rm(DeDuDelft_Compt, DeDuDelft_TID, DuTID_MDF, Master_df, MDF, MDF_Delft, Multi_TID_Received, MultiTID_M, NoDelft, ReceviedIndex, WrongDelftTID, n_occur)
+# rm(CAD6_delft, QA.BGD)
+
+Adult_Valid <- subset(MDF_Delft_QA, MDF_Delft_QA$Age>15)
+Adult_Valid <- subset(MDF_Delft_QA, is.na(MDF_Delft_QA$Xpert2Outcome_num)==F)
+
+# Master_df <- subset(Master_df, Master_df$Refferal.Unit != "Contact Tracing"  & Master_df$Refferal.Unit != "Screening" )
+comment(Adult_Valid) <- "excluding the invalid and error results (after repeat) & excluding contract tracing and screening, only adults (>15)"
+
+# MDF_Delft_QA_complete <- MDF_Delft_QA_complete[complete.cases(MDF_Delft_QA_complete$qXRv2),]
+
+write.csv(Adult_Valid, "Adult_Valid.csv")
+```
+
+
+
+
+
+
+

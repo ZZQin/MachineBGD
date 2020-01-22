@@ -1,0 +1,109 @@
+---
+title: "Lung abnormality tags & TB - Qure.AI"
+author: ZZQ
+output: ioslides_presentation
+---
+```{r global_options, include=FALSE}
+Sys.setenv(LANG = "en")
+knitr::opts_chunk$set(fig.width=8, fig.height=5, 
+                      echo=FALSE, warning=FALSE, message=FALSE)
+
+library(readr)
+library(ggplot2)
+tag <- read_csv("QureAI Score/Bangladesh_8k with tags.csv")
+```
+  
+## fibrosis
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = fibrosis))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+## cavity
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = cavity))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+## opacity
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = opacity))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+## consolidation
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = consolidation))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+
+## nodule
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = nodule))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+## effusion
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = peffusion))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+
+## hilarlymphadenopathy
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = hilarlymphadenopathy))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+
+## cardiomegaly
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = cardiomegaly))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+
+## bluntedcp
+```{r}
+b <- ggplot(tag, aes(x = tuberculosis, y = bluntedcp))
+# Add a loess smoothed fit curve
+b + geom_point(aes(color = tuberculosis), size = 3)+
+  geom_smooth(method = "loess") +
+  scale_color_gradientn(colors = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+
+

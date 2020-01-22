@@ -1,0 +1,99 @@
+# Clean the wrong file name with DICOM tag
+
+```{r Import DICOM Ex}
+###### Match by filename
+DICOM_extract <- read_excel("DICOM extract.xlsx")
+
+LabelbyFileName <- merge(DICOM_extract, MDF, by.x = 'File name', by.y = 'TID_OMRS', all.x = T)
+
+View(LabelbyFileName[, c(1,2,3,4,5,6,7,12,13)])
+LabelbyFileName$Age <- as.numeric(LabelbyFileName$Age)
+LabelbyFileName$AgeDICOM <- as.numeric(LabelbyFileName$AgeDICOM)
+
+LabelbyFileName$agediff <- LabelbyFileName$Age - LabelbyFileName$AgeDICOM
+summary(LabelbyFileName$agediff)
+hist(LabelbyFileName$agediff, breaks = 100)
+
+sum(LabelbyFileName$agediff %in% "0")
+
+sum(LabelbyFileName$Gender %in%  LabelbyFileName$PatientSex & LabelbyFileName$Match %in% "FALSE")
+
+###### Match by DICOM Tag
+LabelbyDICOMName <- merge(DICOM_extract, MDF, by.x = 'PatientID', by.y = 'TID_OMRS', all.x = T)
+
+View(LabelbyDICOMName[, c(1,2,3,4,5,6,7,12,13)])
+LabelbyDICOMName$Age <- as.numeric(LabelbyDICOMName$Age)
+LabelbyDICOMName$AgeDICOM <- as.numeric(LabelbyDICOMName$AgeDICOM)
+
+LabelbyDICOMName$agediff <- LabelbyDICOMName$Age - LabelbyDICOMName$AgeDICOM
+summary(LabelbyDICOMName$agediff)
+hist(LabelbyDICOMName$agediff, breaks = 100)
+
+sum(LabelbyDICOMName$agediff %in% "0")
+
+sum(LabelbyDICOMName$Gender %in% LabelbyDICOMName$PatientSex & LabelbyDICOMName$Match %in% "FALSE")
+
+
+#### 4 Luan #####
+###### Match by filename
+
+DICOMTag_Luan <- read_excel("DICOMTag Luan.xlsx")
+LabelbyFileName <- merge(DICOMTag_Luan, MDF_Delft, by.x = 'FileName', by.y = 'TID_OMRS', all.x = T)
+
+View(LabelbyFileName[, c(1,2,3,4,5,6,7,8, 14, 15)])
+summary(LabelbyFileName$Match)
+
+LabelbyFileName$Age <- as.numeric(LabelbyFileName$Age)
+LabelbyFileName$AgeDICOM <- as.numeric(LabelbyFileName$AgeDICOM)
+
+LabelbyFileName$agediff <- LabelbyFileName$Age - LabelbyFileName$AgeDICOM
+summary(LabelbyFileName$agediff)
+hist(LabelbyFileName$agediff, breaks = 100)
+
+sum(LabelbyFileName$agediff %in% "0")
+
+sum(LabelbyFileName$Gender %in%  LabelbyFileName$PatientSex & LabelbyFileName$Match %in% "FALSE")
+
+###### Match by DICOM Tag
+LabelbyDICOMName <- merge(DICOM_extract, MDF, by.x = 'PatientID', by.y = 'TID_OMRS', all.x = T)
+
+View(LabelbyDICOMName[, c(1,2,3,4,5,6,7,12,13)])
+LabelbyDICOMName$Age <- as.numeric(LabelbyDICOMName$Age)
+LabelbyDICOMName$AgeDICOM <- as.numeric(LabelbyDICOMName$AgeDICOM)
+
+LabelbyDICOMName$agediff <- LabelbyDICOMName$Age - LabelbyDICOMName$AgeDICOM
+summary(LabelbyDICOMName$agediff)
+hist(LabelbyDICOMName$agediff, breaks = 100)
+
+sum(LabelbyDICOMName$agediff %in% "0")
+
+sum(LabelbyDICOMName$Gender %in% LabelbyDICOMName$PatientSex & LabelbyDICOMName$Match %in% "FALSE")
+
+```
+
+
+```{r Cleaning Validated}
+validated <- read_csv("validated.csv")
+n_occur <- data.frame(table(validated$ValidedTID))
+table(n_occur$Freq)
+validated <- as.data.frame(n_occur$Var1[n_occur$Freq<2])
+colnames(validated)[1] <- "TID"
+n_occur <- data.frame(table(validated$TID))
+table(n_occur$Freq)
+
+validated_merge <- merge(validated, Master_df, by.x="TID", by.y = "TID_OMRS")
+n_occur <- data.frame(table(validated_merge$TID))
+table(n_occur$Freq)
+validated_merge <- as.data.frame(n_occur$Var1[n_occur$Freq<2])
+colnames(validated_merge)[1] <- "TID"
+write.csv(validated_merge, "corrected_merge.csv")
+
+missing <- subset(Master_df, !(Master_df$TID_OMRS %in% validated_merge$TID))
+# write.csv(missing, "missing.csv")
+transferred <- read_excel("transferred.xlsx")
+missing <- subset(validated_merge, !(validated_merge$TID %in% transferred$Transferred))
+
+write.csv(missing, "missing.csv")
+
+rm(n_occur)
+```

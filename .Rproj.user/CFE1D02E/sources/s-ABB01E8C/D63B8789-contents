@@ -1,0 +1,63 @@
+```{r Global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=6, 
+                      echo=FALSE, warning=FALSE, message=FALSE)
+Sys.setenv(LANG = "en")
+library(pROC)
+```
+
+#### Sample size calculation is done for a given expected sensitivity and specificity for each of the tests that is being compared to the gold standard. Sample size assumptions are made for the comparison of CXR with CAD4TB, Qure.AI, SemanticMD. Assuming the true AUC of test 1 is 0.85, and a difference in AUC of 0.05 between the two tests with a significance level of 0.9 two sided McNemars test, 
+
+## 7.3 Sample size for comparing accuracy of two diagnostic tests
+```{r Sampel Size for comparing ROC indexes of two diagnostic tests}
+v.binormal <- function(AUC.i){
+  a=qnorm(AUC.i)*1.414
+  V.AUC.i=(0.0099*exp((-a^2/2)))*(6*a^2+16) #BINORMAL base variance of AUC
+  return(V.AUC.i)
+}
+
+alpha = 0.05 # 1- confidence interval 
+beta=0.9 # power
+AUC1=0.85
+AUC2=AUC1+0.05
+
+n = (qnorm(1-alpha/2)*sqrt(2*v.binormal((AUC1+AUC2)/2))+qnorm(beta)*sqrt(v.binormal(AUC1)+v.binormal(AUC2)))^2/(AUC1-AUC2)^2
+n
+```
+
+
+## 7.1 Sample size for estimating accuracy index
+```{r Sample size for estimating accuracy index}
+v.binormal <- function(AUC.i){
+  a=qnorm(AUC.i)*1.414
+  V.AUC.i=(0.0099*exp((-a^2/2)))*(6*a^2+16) #BINORMAL base variance of AUC
+  return(V.AUC.i)
+}
+
+AUC1=0.88
+d=0.03
+alpha = 0.05 # 1- confidence interval 
+n=(qnorm(1-alpha/2)*v.binormal(AUC1))/d^2
+n
+```
+
+# 6 Sample size for studies with binary test outcome  
+## 6.1 Sample size for adequate sensitivity/specificity  
+```{r Sample size for adequate sensitivity/specificity}
+alpha = 0.05 # 1- confidence interval 
+d = 0.1 # margin of error
+p.se = 0.88 # pre-determined value of sensitivty
+# p.sp = 0.5 # pre-determined value of specificity 
+prev = 0.22*0.3 # prevalence
+
+(qnorm(1-alpha/2))^2 * p.se * (1-p.se)/(d^2 * prev)
+
+(qnorm(1-alpha/2))^2 * p.sp * (1-p.sp)/(d^2 * prev)
+
+```
+
+
+## 6.3 Sample size for comparing the sensitivity (or specificity) of two diagnostic tests  
+```{r 6.3 Sample size for comparing the sensitivity (or specificity) of two diagnostic tests}
+
+```
+

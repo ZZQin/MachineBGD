@@ -1,0 +1,90 @@
+Sys.setenv(LANG = "en")
+library(ggplot2)
+library(scales)
+library(epiR)
+library(ggthemes)
+library(RColorBrewer)
+library(plyr)
+library(reshape2)
+library(pROC)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(plotROC)
+library(flextable)
+library(DataExplorer)
+library("readxl")
+as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
+
+Master_df <- read.table(file = "Master_60K_OpenMRS_08_11_2018.csv", header=T, sep=",")
+Master_df$Result.Date <- mdy(Master_df$Radiology.Result.Date)
+Master_df$Result.Year <- quarter(Master_df$Result.Date)
+
+Master_df$Xpert2Outcome_num <- as.character(Master_df$GXP.Result)
+Master_df$Xpert2Outcome_num[Master_df$GXP.Result %in% "MTB Detected"] <- "1"
+Master_df$Xpert2Outcome_num[Master_df$GXP.Result %in% "MTB Not Detected"] <- "0"
+Master_df$Xpert2Outcome_num <- as.numeric(Master_df$Xpert2Outcome_num)
+
+Master_df <- Master_df %>%
+  filter(Result.Date < as.Date("2017-01-01"))
+
+CAD6_delft <- read.table(file = "CAD_delft_2018.csv", sep = ",", header = T, fill = T) # need to be updated. New results recevied from Rick.
+colnames(CAD6_delft)[7] <- "TID_Delft"
+CAD6_delft <- CAD6_delft[, -2]
+CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
+
+QA.BGD <- read.csv(file = "./QureAI Score/qXRv2.csv", header=T, sep=",")
+
+#### Radiologist TB, not TB ####
+# Highly TB Suggestive 
+Master_df$rad.highly.TB <- "0"
+Master_df$rad.highly.TB [Master_df$Radiology.Result == "Highly TB Suggestive" ] <- "1"
+Master_df$rad.highly.TB [Master_df$Radiology.Result == "" | Master_df$Radiology.Result == "Image Unclear" ] <- "NA"
+
+# Highly+ possibly
+Master_df$rad.TB <- "0"
+Master_df$rad.TB [Master_df$Radiology.Result == "Highly TB Suggestive" | Master_df$Radiology.Result =="TB Possible Signs" ] <- "1"
+Master_df$rad.TB [Master_df$Radiology.Result == "" | Master_df$Radiology.Result == "Image Unclear"] <- "NA"
+
+# Any abnormality
+Master_df$rad.abn <- "0"
+Master_df$rad.abn [Master_df$Radiology.Result == "Highly TB Suggestive" | Master_df$Radiology.Result =="TB Possible Signs" | Master_df$Radiology.Result == "Non-TB Abnormality"] <- "1"
+Master_df$rad.abn [Master_df$Radiology.Result == "" | Master_df$Radiology.Result == "Image Unclear"] <- "NA"
+
+###  Clean MasterDF 
+n_occur <- data.frame(table(Master_df$PID_OMRS))
+Master_df <- (Master_df[Master_df$PID_OMRS %in% n_occur$Var1[n_occur$Freq < 2], ]) # execute to remove the duplicated PID
+
+n_occur <- data.frame(table(Master_df$TID_OMRS))
+MasterDF1TID <- (Master_df[Master_df$TID_OMRS %in% n_occur$Var1[n_occur$Freq == 1], ]) # MasterDF1TID is a subset withOUT duplicated TID
+
+###  Clean Delft 
+CAD6_delft <- CAD6_delft[grep("^.{12}$",CAD6_delft$TID_Delft), ]
+DeDuDelft_CAD6 <- CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TB6")]), ]
+n_occur <- data.frame(table(DeDuDelft_CAD6$TID_Delft))
+# But I decided to discard all records with the same TID with different CAD6 (due to inability to trace the true identify of them). 1857 are dumped
+# A df with just unique TID from Delft that don't have different CAD6 score --> 26051
+DelftClean <- DeDuDelft_CAD6[DeDuDelft_CAD6$TID_Delft %in% n_occur$Var1[n_occur$Freq == 1], ] 
+
+###  Merge 
+# MDF_Delft <- merge(MasterDF1TID, DelftClean, by.x = "TID_OMRS", by.y = "TID_Delft")
+# MDF_qxr <- merge(MasterDF1TID, QA.BGD, by.x = "TID_OMRS", by.y = "TID")
+# MDF_Delft_qxr <- merge(MDF_Delft, QA.BGD, by.x = "TID_OMRS", by.y = "TID")
+
+MDF <- merge(MasterDF1TID, DelftClean, by.x = "TID_OMRS", by.y = "TID_Delft", all.x = TRUE)
+MDF <- merge(MDF, QA.BGD, by.x = "TID_OMRS", by.y = "TID", all.x = TRUE)
+
+Df <- MasterDF1TID[!MasterDF1TID$PID_OMRS %in% MDF$PID_OMRS, ]
+summary(Df$Xpert2Outcome_num)
+summary(MDF$Xpert2Outcome_num)
+summary(MasterDF1TID$Xpert2Outcome_num)
+
+# comment(MDF) <- "excluding the invalid and error results (after repeat) & excluding contract tracing and screening, only adults (>=10)"
+# write.csv(MDF, "MDF.csv")
+rm(ReceivedIndex, BGD8168, DelftClean, n_occur, DeDuDelft_CAD6, CAD6_delft, n_occur, Master_df, QA.BGD, MasterDF1TID)
+
+
+
+
+

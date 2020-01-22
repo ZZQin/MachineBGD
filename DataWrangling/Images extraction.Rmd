@@ -1,0 +1,31 @@
+
+# Extract images
+
+```{r Images to Extract}
+# write.csv(NoDelft[, c(21:26)], "NoDelft.csv")
+# length(unique(NoDelft$TID_OMRS))
+# write.csv(MDF[, c(21:26)], "MDF.csv")
+# rm(NoDelft)
+
+######### Extraction 1000 ######
+# rm(Adult_Valid, CAD3_delft,CAD6_delft, DiffNotReceived, DiffReceived, Multi_TID_60K, Multi_TID_Master, n_occur, NotReceived, QA.BGD, ReceivedValid, ReceivedValid, Master_TID_Received, ExtractLuan, Extract)
+# glimpse(Master_TID_Received)
+
+# table(Master_TID_Received$Result.Date)
+
+ExtractBGD1000 <- MDF[order(MDF$Result.Date),]
+ExtractBGD1000 <- ExtractBGD1000[!duplicated(ExtractBGD1000$TID_OMRS), ]
+ExtractBGD1000 <- subset(ExtractBGD1000, !is.na(ExtractBGD1000$Xpert2Outcome_num))
+
+summary(ExtractBGD1000$Xpert2Outcome_num)
+
+ExtractBGD1000 <- ExtractBGD1000[30263:29264, ]
+length(unique(ExtractBGD1000$TID_OMRS))
+
+names(ExtractBGD1000)
+write.csv(ExtractBGD1000[, c(1,2,23)], "ExtractBGD1000.csv")
+
+# BGD1000 <- read_csv("BGD1000.csv")
+glimpse(ExtractLuan)
+length(unique(ExtractLuan$TID_OMRS))
+```

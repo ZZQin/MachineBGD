@@ -1,0 +1,546 @@
+```{r global_options, include=FALSE}
+Sys.setenv(LANG = "en")
+knitr::opts_chunk$set(fig.width=8, fig.height=6, 
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+  
+
+```{r Load}
+source("DataCleaning.R")
+MDF$qXRv2_100 <- MDF$qXRv2*100
+MDF_Original <- MDF
+
+# make it long
+MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100)
+MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "CAD4TB6"] <- "CAD4TB"
+MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "qXRv2_100"] <- "qXR"
+MDF_long$Xpert2Outcome_num <- as.factor(MDF_long$Xpert2Outcome_num)
+```
+
+
+```{r Subset}
+MDF <- subset(MDF, MDF$Age > 18)
+MDF <- subset(MDF, is.na(MDF$Xpert2Outcome_num)==F)
+MDF <- subset(MDF, is.na(MDF$CAD4TB6)==F)
+MDF <- subset(MDF, is.na(MDF$qXRv2)==F)
+MDF <- MDF[MDF$CAD4TB6 !="-1",]
+
+MDF <- MDF %>%
+  filter(Result.Date < as.Date("2016-10-01"))
+```
+
+```{r Table 1}
+library(tableone)
+
+# Define numeric variables
+listVar <- c("Age", "Gender",  "MTB.Burden", "Xpert2Outcome_num","RIF.Result", "Radiology.Result", "rad.highly.TB", "rad.TB", "rad.abn", "CAD4TB6", "qXRv2")
+
+#Define categorical variables
+catVars <- c("Gender", "MTB.Burden", "Xpert2Outcome_num","RIF.Result",  "Radiology.Result", "rad.highly.TB", "rad.TB", "rad.abn")
+
+
+table1 <- CreateTableOne(vars = listVar, strata=c("Xpert2Outcome_num"), data = MDF, factorVars = catVars)
+table1.all <- CreateTableOne(vars = listVar, data = MDF, factorVars = catVars)
+
+print(table1, nonnormal = c("Age", "CAD4TB6", "qXRv2"), cramVars = "Gender", quote = T)
+print(table1.all, nonnormal = c("Age","CAD4TB6", "qXRv2"), cramVars = "Gender", quote = T)
+rm(table1, table1.all)
+```
+  
+### Histogram 
+```{r Histogram, fig.width=8, fig.height=5,}
+p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num))+ geom_histogram(position = 'identity', alpha=0.5, binwidth = 10, aes(y = ..density.., fill = Xpert2Outcome_num)) + xlab("Abnormality Scores of the Deep Learning Systems") + scale_fill_discrete(name ="", labels = c("Xpert Negative", "Xpert Positive"))
+hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "bottom")+ scale_color_brewer(palette="Accent")
+
+tiff("Histogram.tif", width = 14, height = 8, units = "in", res = 100)
+hist
+dev.off()
+
+p + facet_grid(Country ~ DeepLearningSystem, switch = "both") + theme_minimal() + theme(legend.position = "bottom") 
+
+
+
+# ggplot(MDF_long, aes(x=AbnormalityScore, fill=DeepLearningSystem)) + geom_histogram(position = 'identity', alpha = 0.5, bindwidth = 10, aes(y=..density.., fill=DeepLearningSystem))
+
+# density plot
+# ggplot(MDF_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num))+ geom_density(position = 'identity', alpha=0.5, binwidth = 10) 
+
+# pooled 
+# p + geom_histogram(position = 'identity', alpha=0.5, aes(y = ..density.., fill = Xpert2Outcome_num), bins = 20) + stat_density(position = 'identity',aes(colour = Xpert2Outcome_num)) # Pooled
+
+library(moments)
+skewness(MDF[MDF$Xpert2Outcome_num ==1, 22]) #22 CAD4TB6, 23 qXR2, 34 Lunit
+skewness(MDF[MDF$Xpert2Outcome_num ==1, 23]) 
+# skewness(MDF[MDF$Xpert2Outcome_num ==1, 24]) 
+
+skewness(MDF[MDF$Xpert2Outcome_num ==0, 22]) 
+skewness(MDF[MDF$Xpert2Outcome_num ==0, 23]) 
+# skewness(MDF[MDF$Xpert2Outcome_num ==0, 24]) 
+# names(MDF)[28]
+```
+
+###  Multi-ROC (Xpert Reference) 
+```{r Multi-ROC_All_Xpert}
+roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, MDF)
+roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv2_100, MDF)
+
+MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "CAD4TB6"] <- "CAD4TB"
+# MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "Lunit_100"] <- "Lunit"
+MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "qXRv2_100"] <- "qXR"
+
+MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
+
+# Multi-ROC
+ggROC <- ggplot(MDF_long, aes(d = Xpert2Outcome_num, m = AbnormalityScore, color = DeepLearningSystem)) + geom_roc(cutoffs.at = c(10,20,30,40,50,60,70,80,90)) + style_roc(xlab = "1 - Specificity", ylab = "Sensitivity")
+
+ggROC <- ggROC + annotate("text", x = .75, y = .15, 
+            label = paste(" CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", "\n",
+      # "Lunit: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n",
+      "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n", sep = ""), size = 4.5)+
+  ggtitle("Figure 2a: The ROC curves of CAD4TB (v6) and qXR (v2) using Xpert results as the reference (n=1196)")
+  
+tiff("Figure-2 ROCs.tif", width = 10, height = 7.9, units = "in", res = 100)
+ggROC
+dev.off()
+
+ggROC1 <- ggROC + coord_cartesian(xlim = c(0.1, 0.4), ylim = c(0.90, 1) ) +
+  ggtitle("Figure 2b: Zoomed-in view of the square marked part of Fig. 2a")+theme_light()
+
+tiff("Figure-2b Creswell.tif", width = 12, height = 4, units = "in", res = 100)
+ggROC1
+dev.off()
+# plot_interactive_roc(ggROC, width =12, height = 9.5) 
+# plot_interactive_roc(ggROC1, width =12, height = 4)
+```
+  
+
+```{r Optimal.cutoff Xpert}
+library(OptimalCutpoints)
+
+BestCutoff <- optimal.cutpoints(X = "AbnormalityScore", status = "Xpert2Outcome_num", tag.healthy = 0, methods = "ROC01", data = MDF_long, pop.prev = NULL, categorical.cov = "DeepLearningSystem", control = control.cutpoints(valueSe=0.95, maxSp=TRUE), ci.fit = FALSE, conf.level = 0.95, trace = FALSE)
+summary(BestCutoff)
+
+BestCutoff <- optimal.cutpoints(X = "AbnormalityScore", status = "Xpert2Outcome_num", tag.healthy = 0, methods = "MinValueSe", data = MDF_long, pop.prev = NULL, categorical.cov = "DeepLearningSystem", control = control.cutpoints(valueSe=0.98, maxSp=TRUE), ci.fit = FALSE, conf.level = 0.95, trace = FALSE)
+summary(BestCutoff)
+
+# plot(BestCutoff)
+rm(BestCutoff)
+
+```
+
+
+
+###  Multi-ROC (Radiologist reference: any lung abnormality)  
+```{r ROC Lists & Multi-ROC Radiologist}
+roc_CAD6 <- ci.auc(CXR1.highly.prob.any ~ CAD4TB6, MDF)
+roc_CAD5 <- ci.auc(CXR1.highly.prob.any ~ CAD4TB5, MDF)
+roc_qure <- ci.auc(CXR1.highly.prob.any ~ qXR2, MDF)
+roc_Lunit <- ci.auc(CXR1.highly.prob.any ~ Lunit, MDF)
+
+MDF_long$DeepLearningSystem <- as.factor(MDF_long$DeepLearningSystem)
+
+# Multi-ROC
+ggROC <- ggplot(MDF_long, aes(d = rad.abn, m = AbnormalityScore, color = DeepLearningSystem)) + geom_roc(n.cuts = 6, labelsize = 3) + style_roc(xlab = "1 - Specificity", ylab = "Sensitivity")
+
+ggROC <- ggROC + annotate("text", x = .75, y = .15, 
+            label = paste(" CAD4TB:", round(roc_CAD6[2],3), "(95% CI:", round(roc_CAD6[1],3), "-", round(roc_CAD6[3],3), ")", "\n",
+      # "Lunit", round(roc_Lunit[2],3), "(95% CI:", round(roc_Lunit[1],3), "-", round(roc_Lunit[3],3), ")", "\n",
+      "qXR:", round(roc_qure[2],3), "(95% CI:", round(roc_qure[1],3), "-", round(roc_qure[3],3), ")", "\n"), size = 3)+
+  ggtitle("Diagnostic accuracy of CAD4TBV6, Lunit, and qXR compared against senior radiologists (Pooled, n=1196)")
+
+ggROC
+# plot_interactive_roc(ggROC, width = 12, height = 8)
+
+```
+
+
+### Radiologist Accuracy (highly)
+```{r Accuracy of Radiologist (high)}
+TP <- sum(MDF$rad.highly.TB %in% "1" & MDF$Xpert2Outcome_num==1)
+FP <- sum(MDF$rad.highly.TB %in% 1 & MDF$Xpert2Outcome_num==0)
+TN <- sum(MDF$rad.highly.TB %in% 0 & MDF$Xpert2Outcome_num==0)
+FN <- sum(MDF$rad.highly.TB %in% 0 & MDF$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+
+### Radiologist Accuracy (high+possible)
+```{r Accuracy of Radiologist (high+possible)}
+TP <- sum(MDF$rad.TB %in% "1" & MDF$Xpert2Outcome_num==1)
+FP <- sum(MDF$rad.TB %in% 1 & MDF$Xpert2Outcome_num==0)
+TN <- sum(MDF$rad.TB %in% 0 & MDF$Xpert2Outcome_num==0)
+FN <- sum(MDF$rad.TB %in% 0 & MDF$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+### Radiologist Accuracy (any)
+```{r Accuracy of Radiologist any}
+TP <- sum(MDF$rad.abn %in% "1" & MDF$Xpert2Outcome_num==1)
+FP <- sum(MDF$rad.abn %in% 1 & MDF$Xpert2Outcome_num==0)
+TN <- sum(MDF$rad.abn %in% 0 & MDF$Xpert2Outcome_num==0)
+FN <- sum(MDF$rad.abn %in% 0 & MDF$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+
+##  Single Product by Country 
+```{r Multi-ROC by country, eval=F}
+# roc1 <- roc(Xpert2Outcome_num ~ Lunit, MDF)
+roc1 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, MDF)
+
+# Multi-ROC
+ggROC <- 
+ggplot(MDF, aes(d = Xpert2Outcome_num, m = CAD4TB6)) +  geom_roc(cutoffs.at = c(50, 60, 70, 80, 90)) + style_roc(xlab = "1 - Specificity", ylab = "Sensitivity")+ ggtitle("Diagnostic accuracy of CAD4TB6 compared against Xpert")
+
+AUC <- calc_auc(ggROC)
+
+
+ggROC <- ggROC+ annotate("text", x = .75, y = .15, 
+            label = paste("qXR v2", round(AUC$AUC,3), "(95% CI:", round(roc1[1],3), "-", round(roc1[3],3), ")", "\n"),
+            size = 5)+
+  ggtitle("Diagnostic accuracy of CAD4TB6 compared against Xpert (n=23,284)") 
+
+
+ggROC
+plot_interactive_roc(ggROC, width = 12, height = 10)
+```
+
+## Cutoff Table (Full)
+```{r cutoff table}
+###### Qure.AI Score by 0.01 #########
+qure_ai_score <- seq(0.01,1, by = 0.01)
+
+mylist <- NULL
+mylist <- as.list(mylist)
+
+for (i in 1:100){
+myfunction <- function(CountryX, car.cutoff){
+a <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("Dis+","Dis-")
+rownames(dat) <- c("Test+","Test-")
+rval <- epi.tests(dat, conf.level = 0.95)
+sensitivity <- as.vector(round((rval$elements$sensitivity),2))
+specificity <- as.vector(round((rval$elements$specificity),2))
+pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+
+perc_above_CAR_Score<- sum(CountryX$qXRv2 >= car.cutoff)/length(CountryX$ResearchID.x)
+Score <- qure_ai_score[i]
+
+accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+
+return(accuracy)
+}
+
+accuracy <- myfunction(MDF, qure_ai_score[i])
+mylist[[i]] <- list(accuracy)
+
+}
+
+QureDF <- data.frame(matrix(unlist(mylist), nrow=100, byrow=T))
+QureDF$Country <- paste("Pooled")
+
+QureDF$Sen_95CI <- paste(QureDF[, 2], "-", QureDF[, 3], sep = "")
+QureDF$Spe_95CI <- paste(QureDF[, 5], "-", QureDF[, 6], sep = "")
+QureDF$PPV_95CI <- paste(QureDF[, 8], "-", QureDF[, 9], sep = "")
+QureDF$NPV_95CI <- paste(QureDF[, 11], "-", QureDF[, 12], sep = "")
+QureDF$CAD_System <- paste("qXR")
+# write.csv(QureDF, "qure.ai by 0.01.csv")
+# rm(qure_ai_score)
+
+
+#### CAD6 Score by 1 ######
+CAD6 <- seq(1,99, by = 1)
+
+mylist <- NULL
+mylist <- as.list(mylist)
+
+for (i in 1:99){
+myfunction <- function(CountryX, car.cutoff){
+a <- sum(CountryX$CAD4TB6 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$CAD4TB6 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$CAD4TB6 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$CAD4TB6 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("Dis+","Dis-")
+rownames(dat) <- c("Test+","Test-")
+rval <- epi.tests(dat, conf.level = 0.95)
+sensitivity <- as.vector(round((rval$elements$sensitivity),2))
+specificity <- as.vector(round((rval$elements$specificity),2))
+pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+
+
+perc_above_CAR_Score<- sum(CountryX$CAD4TB6 >= car.cutoff)/length(CountryX$ResearchID.x)
+Score <- CAD6[i]
+
+accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+
+return(accuracy)
+}
+
+accuracy_both <- myfunction(MDF, CAD6[i])
+mylist[[i]] <- list(accuracy_both)
+}
+CAD6DF <- data.frame(matrix(unlist(mylist), nrow=99, byrow=T))
+CAD6DF$Country <- paste("Pooled")
+
+CAD6DF$Sen_95CI <- paste(CAD6DF[, 2], "-", CAD6DF[, 3], sep = "")
+CAD6DF$Spe_95CI <- paste(CAD6DF[, 5], "-", CAD6DF[, 6], sep = "")
+CAD6DF$PPV_95CI <- paste(CAD6DF[, 8], "-", CAD6DF[, 9], sep = "")
+CAD6DF$NPV_95CI <- paste(CAD6DF[, 11], "-", CAD6DF[, 12], sep = "")
+CAD6DF$CAD_System <- paste("CAD6")
+rm(CAD6)
+
+
+#### Lunit Score by 0.01  ######
+Lunit <- seq(0,1, by = 0.01)
+
+mylist <- NULL
+mylist <- as.list(mylist)
+
+for (i in 1:101){
+myfunction <- function(CountryX, car.cutoff){
+a <- sum(CountryX$Lunit >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$Lunit >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$Lunit < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$Lunit < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("Dis+","Dis-")
+rownames(dat) <- c("Test+","Test-")
+rval <- epi.tests(dat, conf.level = 0.95)
+sensitivity <- as.vector(round((rval$elements$sensitivity),2))
+specificity <- as.vector(round((rval$elements$specificity),2))
+pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+
+
+perc_above_CAR_Score<- sum(CountryX$Lunit >= car.cutoff)/length(CountryX$ResearchID.x)
+Score <- Lunit[i]
+
+accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+
+return(accuracy)
+}
+
+accuracy_both <- myfunction(MDF, Lunit[i])
+mylist[[i]] <- list(accuracy_both)
+}
+
+LunitDF_both <- data.frame(matrix(unlist(mylist), nrow=101, byrow=T))
+LunitDF_both$Country <- paste("Pooled")
+
+
+LunitDF$Sen_95CI <- paste(LunitDF[, 2], "-", LunitDF[, 3], sep = "")
+LunitDF$Spe_95CI <- paste(LunitDF[, 5], "-", LunitDF[, 6], sep = "")
+LunitDF$PPV_95CI <- paste(LunitDF[, 8], "-", LunitDF[, 9], sep = "")
+LunitDF$NPV_95CI <- paste(LunitDF[, 11], "-", LunitDF[, 12], sep = "")
+LunitDF$CAD_System <- paste("Lunit")
+# write.csv(LunitDF, "Lunit_0.01.csv")
+
+######### Merge DFs ######
+CAD_Xpert <- rbind(CAD6DF, QureDF)
+colnames(CAD_Xpert)[1] <- "Sens"
+colnames(CAD_Xpert)[2] <- "Sens_L"
+colnames(CAD_Xpert)[3] <- "Sens_H"
+colnames(CAD_Xpert)[4] <- "Spec"
+colnames(CAD_Xpert)[5] <- "Spec_L"
+colnames(CAD_Xpert)[6] <- "Spec_H"
+colnames(CAD_Xpert)[7] <- "ppv"
+colnames(CAD_Xpert)[8] <- "PPV_L"
+colnames(CAD_Xpert)[9] <- "PPV_H"
+colnames(CAD_Xpert)[10] <- "npv"
+colnames(CAD_Xpert)[11] <- "NPV_L"
+colnames(CAD_Xpert)[12] <- "NPV_H"
+colnames(CAD_Xpert)[13] <- "% Above"
+colnames(CAD_Xpert)[14] <- "Score"
+colnames(CAD_Xpert)[15] <- "Correct.rate"
+CAD_Xpert$Sensitivity <- paste(CAD_Xpert$Sens, "(", CAD_Xpert$Sen_95CI, ")", sep = "")
+CAD_Xpert$Specificity <- paste(CAD_Xpert$Spec, "(", CAD_Xpert$Spe_95CI, ")", sep = "")
+CAD_Xpert$PPV <- paste(CAD_Xpert$ppv, "(", CAD_Xpert$PPV_95CI, ")", sep = "")
+CAD_Xpert$NPV <- paste(CAD_Xpert$npv, "(", CAD_Xpert$NPV_95CI, ")", sep = "")
+CAD_Xpert$`% Above` <- round(CAD_Xpert$`% Above`, 2)
+
+CAD_Xpert <- CAD_Xpert[, c(16, 21, 14, 13, 15, 22:25)]
+
+write.csv(CAD_Xpert, "CAD_Xpert Cutoffs TABLE.csv")
+```
+
+
+## both-direction stepwise algorithsmm based on AIC to select the model  
+  
+```{r define log reg function}
+logistic.regression.or.ci <- function(regress.out, level=0.95)
+{
+################################################################
+#                                                              #
+#  This function takes the output from a glm                   #
+#  (logistic model) command in R and provides not              #
+#  only the usual output from the summary command, but         #
+#  adds confidence intervals for all coefficients and OR's.    #
+#                                                              #
+#  This version accommodates multiple regression parameters    #
+#                                                              #
+################################################################
+usual.output <- summary(regress.out)
+z.quantile <- qnorm(1-(1-level)/2)
+number.vars <- length(regress.out$coefficients)
+OR <- exp(regress.out$coefficients[-1])
+temp.store.result <- matrix(rep(NA, number.vars*2), nrow=number.vars)
+for(i in 1:number.vars)
+{
+      temp.store.result[i,] <- summary(regress.out)$coefficients[i] +
+      c(-1, 1) * z.quantile * summary(regress.out)$coefficients[i+number.vars]
+}
+  intercept.ci <- temp.store.result[1,]
+  slopes.ci <- temp.store.result[-1,]
+  OR.ci <- exp(slopes.ci)
+  output <- list(regression.table = usual.output, intercept.ci = intercept.ci,
+              slopes.ci = slopes.ci, OR=OR, OR.ci = OR.ci)
+return(output)
+}
+
+```
+
+```{r  dichotmize CAR}
+MDF$highCAD[MDF$CAD4TB6 >= 57] <- "1"
+MDF$highCAD[MDF$CAD4TB6 < 57] <- "0"
+
+MDF$highLunit[MDF$Lunit >=0.55] <- "1"
+MDF$highLunit[MDF$Lunit < 0.55] <- "0"
+
+MDF$HighqXR[MDF$qXRv2 >= 0.56] <- "1"
+MDF$HighqXR[MDF$qXRv2 < 0.56] <- "0"
+
+
+
+MDF$Xpert2Outcome_num <- as.factor(MDF$Xpert2Outcome_num)
+# ggplot(MDF, aes(x=Age, color=Xpert2Outcome_num)) + geom_histogram(position = 'identity', alpha=0.5, binwidth = 10, aes (y = ..density.., fill = Xpert2Outcome_num)) 
+
+## Missed by CAR ###
+MDF$CADMissed[MDF$highCAD == 0 & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by CAD6" 
+MDF$LunitMissed[MDF$highLunit == 0  & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by Lunit"  
+MDF$qXRMissed[MDF$HighqXR == 0  & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by qXR"
+MDF$CADMissed <- as.factor(MDF$CADMissed)
+MDF$LunitMissed <- as.factor(MDF$LunitMissed)
+MDF$qXRMissed <- as.factor(MDF$qXRMissed)
+
+summary(MDF[, c(39:41)])
+# View(MDF[, c(1, 19, 27:29, 31,33, 38:41)])
+# View(MDF[complete.cases(MDF[, 39:41]),  c(1, 19, 27:29, 31,33, 38:41)])
+# View(MDF[complete.cases(MDF[, 39]),  c(1, 19, 27:29, 31,33, 38:41)])
+# View(MDF[complete.cases(MDF[, 40]),  c(1, 19, 27:29, 31,33, 38:41)])
+# View(MDF[complete.cases(MDF[, 41]),  c(1, 19, 27:29, 31,33, 38:41)])
+MDF$temp <- paste(MDF$CAD6CADMissed64, MDF$LunitMissed, MDF$qXRMissed)
+(MDF[order(MDF$temp),  c(1, 19, 27:29, 31,33, 38:45)])
+
+```
+
+
+### Final multiple logistic regression model
+```{r uni reg model, eval=F}
+# rm(df)
+NC.reg <- MDF
+# NC.reg <- subset(MDF, MDF$Country %in% "Cameroon")
+model.uni <- glm(formula = Xpert2Outcome_num ~  Age, family = binomial(link = "logit"), data = NC.reg)
+Age <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  Sex, family = binomial(link = "logit"), data = NC.reg)
+Sex <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  Cough, family = binomial(link = "logit"), data = NC.reg)
+Cough <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  Fever, family = binomial(link = "logit"), data = NC.reg)
+Fever <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  WeightLoss, family = binomial(link = "logit"), data = NC.reg)
+WeightLoss <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  NightSweat, family = binomial(link = "logit"), data = NC.reg)
+NightSweat <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  TBHistory, family = binomial(link = "logit"), data = NC.reg)
+TBHistory <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  highCAD, family = binomial(link = "logit"), data = NC.reg)
+highCAD <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  highLunit, family = binomial(link = "logit"), data = NC.reg)
+highLunit <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+model.uni <- glm(formula = Xpert2Outcome_num ~  HighqXR, family = binomial(link = "logit"), data = NC.reg)
+HighqXR <- paste(round(logistic.regression.or.ci(model.uni)$OR, 2), "(", round(logistic.regression.or.ci(model.uni)$OR.ci[1], 2), "-", round(logistic.regression.or.ci(model.uni)$OR.ci[2], 2), ")")
+
+df <- rbind(Age, Sex, Cough, Fever, WeightLoss, NightSweat, TBHistory, highCAD, highLunit, HighqXR)
+View(df[,])
+```
+
+
+```{r Logistic Regression Stepwise Selection, eval=F}
+library(caTools)
+# set.seed(88)
+# split <- sample.split(MDF$Xpert2Outcome_num, SplitRatio = 0.75)
+# #get training and test data
+# MDF_train <- subset(MDF, split == TRUE)
+# MDF_test <- subset(MDF, split == FALSE)
+# NC.reg <- MDF
+# NC.reg <- subset(MDF, MDF$Country %in% "Nepal")
+
+
+model.null = glm(Xpert2Outcome_num ~ 1, 
+                 data=NC.reg,
+                 family = binomial(link="logit")
+                 )
+
+model.full <- glm (Xpert2Outcome_num ~ Age + Sex + Cough + Fever + WeightLoss + NightSweat + highLunit + TBHistory, 
+                   data = NC.reg, 
+                   family = binomial(link="logit"))
+
+
+step(model.null,
+     scope = list(upper=model.full),
+             direction="both",
+             test="Chisq",
+             data=NC.reg)
+
+final.model <- logistic.regression.or.ci(glm(formula = Xpert2Outcome_num ~ highLunit + Age + Cough + Sex + WeightLoss + Fever, family = binomial(link = "logit"), data = NC.reg))
+
+adjOR <- final.model$OR.ci
+adjOR <- round(cbind(final.model$OR, adjOR), 2)
+adjOR
+# OR <- paste(adjOR[,1], "(", adjOR[,2], "-", adjOR[,3], ")")
+```
+  

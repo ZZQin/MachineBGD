@@ -1,0 +1,5 @@
+"0","p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..density.., fill = Xpert2Outcome_num)) + xlab(""Abnormality Scores of the Deep Learning Systems"") + scale_fill_discrete(name ="""", labels = c(""Xpert Negative"", ""Xpert Positive""))"
+"0","hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = ""bottom"")+ scale_color_brewer(palette=""Accent"")"
+"0",""
+"0","tiff(""Results/Histogram.tif"", width = 14, height = 8, units = ""in"", res = 100)"
+"0","hist"

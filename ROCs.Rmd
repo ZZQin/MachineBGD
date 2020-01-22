@@ -1,0 +1,331 @@
+```{r Global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=6, echo=FALSE, warning=FALSE, message=FALSE)
+
+Sys.setenv(LANG = "en")
+library(ggplot2)
+library(scales)
+library(epiR)
+library(ggthemes)
+library(RColorBrewer)
+library(plyr)
+library(reshape2)
+library(pROC)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(plotROC)
+library(flextable)
+
+# as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
+```
+
+```{r}
+Adult_Valid <- read_csv('Adult_Valid.csv')
+```
+
+
+### Histogram 
+```{r Histogram, fig.width=8, fig.height=5,}
+# make it long
+Adult_Valid$qXRv2_100 <- Adult_Valid$qXRv2*100
+
+Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100)
+
+
+# p <- ggplot(Adult_Valid,aes(CAD4TB6))
+# p <- ggplot(Adult_Valid,aes(qXRv2))
+# p <- ggplot(Adult_Valid,aes(DrCADxScore))
+
+Adult_Valid_long$Xpert2Outcome_num <- as.factor(Adult_Valid_long$Xpert2Outcome_num)
+
+p <- ggplot(Adult_Valid_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num))+ geom_histogram(position = 'identity', alpha=0.5, binwidth = 10, aes(y = ..density.., fill = Xpert2Outcome_num)) + xlab("Abnormality Scores of the Deep Learning Systems") + scale_fill_discrete(name ="", labels = c("Xpert Negative", "Xpert Positive"))
+p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "bottom")+ scale_color_brewer(palette="Accent")
+
+
+# p + facet_grid(Country ~ DeepLearningSystem, switch = "both") + theme_minimal() + theme(legend.position = "bottom") 
+
+
+# ggplot(Adult_Valid_long, aes(x=DL.Score, fill=DL.System)) + geom_histogram(position = 'identity', alpha = 0.5, bindwidth = 10, aes(y=..density.., fill=DL.System))
+
+# density plot
+# ggplot(Adult_Valid_long,aes(x=DL.Score, fill=Xpert2Outcome_num))+ geom_density(position = 'identity', alpha=0.5, binwidth = 10) 
+
+# pooled 
+# p + geom_histogram(position = 'identity', alpha=0.5, aes(y = ..density.., fill = Xpert2Outcome_num), bins = 20) + stat_density(position = 'identity',aes(colour = Xpert2Outcome_num)) # Pooled
+
+# library(moments)
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 28]) #28 CAD4TB6, 29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 29]) #29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 33]) #33 Lunit
+# 
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 28]) #28 CAD4TB6, 29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 29]) #29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 33]) #33 Lunit
+
+```
+
+###  Multi-ROC (Xpert Reference) 
+```{r Multi-ROC_All_Xpert}
+# make it long
+Adult_Valid$qXRv2_100 <- Adult_Valid$qXRv2*100
+
+Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100)
+
+
+############# Pooled ###############
+roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, Adult_Valid)
+roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv2_100, Adult_Valid)
+# roc_Lunit <- ci.auc(Xpert2Outcome_num ~ Lunit, Adult_Valid)
+# Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "Lunit_100"] <- "Lunit"
+
+Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "CAD4TB6"] <- "CAD4TB"
+Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "qXRv2_100"] <- "qXR"
+
+
+Adult_Valid_long$DeepLearningSystem <- as.factor(Adult_Valid_long$DeepLearningSystem)
+
+# Multi-ROC
+ggROC <- ggplot(Adult_Valid_long, aes(d = Xpert2Outcome_num, m = AbnormalityScore, color = DeepLearningSystem)) + geom_roc(cutoffs.at = c(10,20,30,40,50,60,70,80,90)) + style_roc(xlab = "1 - Specificity", ylab = "Sensitivity")
+
+ggROC <- ggROC + annotate("text", x = .75, y = .15, 
+            label = paste(" CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", "\n",
+      # "Lunit: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n",
+      "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n", sep = ""), size = 4.5)+
+  ggtitle("The ROC curves of CAD4TB (v6) and qXR (v2) using Xpert results as the reference (n=18682)")
+
+  
+ggROC
+ggROC1 <- ggROC + coord_cartesian(xlim = c(0.1, 0.4), ylim = c(0.90, 1) ) +
+  ggtitle("Figure 2b: Zoomed-in view of the square marked part of Fig. 2a")+theme_light()
+ggROC1
+
+# plot_interactive_roc(ggROC, width =12, height = 9.5)
+# plot_interactive_roc(ggROC1, width =12, height = 4)
+```
+
+
+### Radiologist Accuracy (highly)
+```{r Accuracy of Radiologist1}
+TP <- sum(Adult_Valid$raiolgogy_highly %in% "1" & Adult_Valid$Xpert2Outcome_num==1)
+FP <- sum(Adult_Valid$raiolgogy_highly %in% 1 & Adult_Valid$Xpert2Outcome_num==0)
+TN <- sum(Adult_Valid$raiolgogy_highly %in% 0 & Adult_Valid$Xpert2Outcome_num==0)
+FN <- sum(Adult_Valid$raiolgogy_highly %in% 0 & Adult_Valid$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+
+### Radiologist Accuracy (possible)
+```{r Accuracy of Radiologist2}
+TP <- sum(Adult_Valid$raiolgogy_possible %in% "1" & Adult_Valid$Xpert2Outcome_num==1)
+FP <- sum(Adult_Valid$raiolgogy_possible %in% 1 & Adult_Valid$Xpert2Outcome_num==0)
+TN <- sum(Adult_Valid$raiolgogy_possible %in% 0 & Adult_Valid$Xpert2Outcome_num==0)
+FN <- sum(Adult_Valid$raiolgogy_possible %in% 0 & Adult_Valid$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+
+### Radiologist Accuracy (any abnormality)
+```{r Accuracy of Radiologist3}
+TP <- sum(Adult_Valid$any_abnormality %in% "1" & Adult_Valid$Xpert2Outcome_num==1)
+FP <- sum(Adult_Valid$any_abnormality %in% 1 & Adult_Valid$Xpert2Outcome_num==0)
+TN <- sum(Adult_Valid$any_abnormality %in% 0 & Adult_Valid$Xpert2Outcome_num==0)
+FN <- sum(Adult_Valid$any_abnormality %in% 0 & Adult_Valid$Xpert2Outcome_num==1)
+
+
+dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+colnames(dat) <- c("Xpert+","Xpert-")
+rownames(dat) <- c("CXR+","CXR-")
+rval <- epi.tests(dat, conf.level = 0.95)
+rval
+# print(rval$elements[c(47, 43,39,35)] ) 
+rm(TP, FP, TN, FN)
+```
+
+
+
+## Cutoff Table (Full)
+```{r cutoff table}
+###### Qure.AI Score by 0.01 #########
+qure_ai_score <- seq(0.01,1, by = 0.01)
+
+mylist <- NULL
+mylist <- as.list(mylist)
+
+for (i in 1:100){
+myfunction <- function(CountryX, car.cutoff){
+a <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("Dis+","Dis-")
+rownames(dat) <- c("Test+","Test-")
+rval <- epi.tests(dat, conf.level = 0.95)
+sensitivity <- as.vector(round((rval$elements$sensitivity),2)) 
+specificity <- as.vector(round((rval$elements$specificity),2))
+pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+
+perc_above_CAR_Score<- sum(CountryX$qXRv2 >= car.cutoff)/length(CountryX$TID_OMRS)
+Score <- qure_ai_score[i]
+
+accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+
+return(accuracy)
+}
+
+accuracy <- myfunction(Adult_Valid, qure_ai_score[i])
+mylist[[i]] <- list(accuracy)
+
+}
+
+QureDF_both <- data.frame(matrix(unlist(mylist), nrow=100, byrow=T))
+QureDF_both$Country <- paste("Pooled")
+
+QureDF <- QureDF_both
+QureDF$Sen_95CI <- paste(QureDF[, 2], "-", QureDF[, 3], sep = "")
+QureDF$Spe_95CI <- paste(QureDF[, 5], "-", QureDF[, 6], sep = "")
+QureDF$PPV_95CI <- paste(QureDF[, 8], "-", QureDF[, 9], sep = "")
+QureDF$NPV_95CI <- paste(QureDF[, 11], "-", QureDF[, 12], sep = "")
+QureDF$CAD_System <- paste("qXR")
+# write.csv(QureDF, "qure.ai by 0.01.csv")
+# rm(qure_ai_score)
+
+
+#### CAD6 Score by 1 ######
+CAD6 <- seq(1,99, by = 1)
+
+mylist <- NULL
+mylist <- as.list(mylist)
+
+for (i in 1:99){
+myfunction <- function(CountryX, car.cutoff){
+a <- sum(CountryX$CAD4TB6 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$CAD4TB6 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$CAD4TB6 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$CAD4TB6 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+colnames(dat) <- c("Dis+","Dis-")
+rownames(dat) <- c("Test+","Test-")
+rval <- epi.tests(dat, conf.level = 0.95)
+sensitivity <- as.vector(round((rval$elements$sensitivity),2))
+specificity <- as.vector(round((rval$elements$specificity),2))
+pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+
+
+perc_above_CAR_Score<- sum(CountryX$CAD4TB6 >= car.cutoff)/length(CountryX$TID_OMRS)
+Score <- CAD6[i]
+
+accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+
+return(accuracy)
+}
+
+accuracy_both <- myfunction(Adult_Valid, CAD6[i])
+mylist[[i]] <- list(accuracy_both)
+}
+CAD6DF_both <- data.frame(matrix(unlist(mylist), nrow=99, byrow=T))
+CAD6DF_both$Country <- paste("Pooled")
+
+CAD6DF <- CAD6DF_both
+CAD6DF$Sen_95CI <- paste(CAD6DF[, 2], "-", CAD6DF[, 3], sep = "")
+CAD6DF$Spe_95CI <- paste(CAD6DF[, 5], "-", CAD6DF[, 6], sep = "")
+CAD6DF$PPV_95CI <- paste(CAD6DF[, 8], "-", CAD6DF[, 9], sep = "")
+CAD6DF$NPV_95CI <- paste(CAD6DF[, 11], "-", CAD6DF[, 12], sep = "")
+CAD6DF$CAD_System <- paste("CAD4TB")
+
+
+
+# #### Lunit Score by 0.01  ######
+# Lunit <- seq(0,1, by = 0.01)
+# 
+# mylist <- NULL
+# mylist <- as.list(mylist)
+# 
+# for (i in 1:101){
+# myfunction <- function(CountryX, car.cutoff){
+# a <- sum(CountryX$Lunit >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+# b <- sum(CountryX$Lunit >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+# c <- sum(CountryX$Lunit < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+# d <- sum(CountryX$Lunit < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+# dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
+# colnames(dat) <- c("Dis+","Dis-")
+# rownames(dat) <- c("Test+","Test-")
+# rval <- epi.tests(dat, conf.level = 0.95)
+# sensitivity <- as.vector(round((rval$elements$sensitivity),2))
+# specificity <- as.vector(round((rval$elements$specificity),2))
+# pv.positive <- as.vector(round((rval$elements$pv.positive),2))
+# pv.negative <- as.vector(round((rval$elements$pv.negative),2))
+# correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
+# 
+# 
+# perc_above_CAR_Score<- sum(CountryX$Lunit >= car.cutoff)/length(CountryX$TID_OMRS)
+# Score <- Lunit[i]
+# 
+# accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)
+# 
+# return(accuracy)
+# }
+# 
+# accuracy_both <- myfunction(Adult_Valid, Lunit[i])
+# mylist[[i]] <- list(accuracy_both)
+# }
+# 
+# LunitDF_both <- data.frame(matrix(unlist(mylist), nrow=101, byrow=T))
+# LunitDF_both$Country <- paste("Pooled")
+# 
+# LunitDF <- LunitDF_both
+# LunitDF$Sen_95CI <- paste(LunitDF[, 2], "-", LunitDF[, 3], sep = "")
+# LunitDF$Spe_95CI <- paste(LunitDF[, 5], "-", LunitDF[, 6], sep = "")
+# LunitDF$PPV_95CI <- paste(LunitDF[, 8], "-", LunitDF[, 9], sep = "")
+# LunitDF$NPV_95CI <- paste(LunitDF[, 11], "-", LunitDF[, 12], sep = "")
+# LunitDF$CAD_System <- paste("Lunit")
+
+
+######### Merge DFs ######
+CAD_Xpert <- rbind(CAD6DF, QureDF)
+colnames(CAD_Xpert)[1] <- "Sens"
+colnames(CAD_Xpert)[2] <- "Sens_L"
+colnames(CAD_Xpert)[3] <- "Sens_H"
+colnames(CAD_Xpert)[4] <- "Spec"
+colnames(CAD_Xpert)[5] <- "Spec_L"
+colnames(CAD_Xpert)[6] <- "Spec_H"
+colnames(CAD_Xpert)[7] <- "ppv"
+colnames(CAD_Xpert)[8] <- "PPV_L"
+colnames(CAD_Xpert)[9] <- "PPV_H"
+colnames(CAD_Xpert)[10] <- "npv"
+colnames(CAD_Xpert)[11] <- "NPV_L"
+colnames(CAD_Xpert)[12] <- "NPV_H"
+colnames(CAD_Xpert)[13] <- "% Above"
+colnames(CAD_Xpert)[14] <- "Score"
+colnames(CAD_Xpert)[15] <- "Correct.rate"
+CAD_Xpert$Sensitivity <- paste(CAD_Xpert$Sens, "(", CAD_Xpert$Sen_95CI, ")", sep = "")
+CAD_Xpert$Specificity <- paste(CAD_Xpert$Spec, "(", CAD_Xpert$Spe_95CI, ")", sep = "")
+CAD_Xpert$PPV <- paste(CAD_Xpert$ppv, "(", CAD_Xpert$PPV_95CI, ")", sep = "")
+CAD_Xpert$NPV <- paste(CAD_Xpert$npv, "(", CAD_Xpert$NPV_95CI, ")", sep = "")
+CAD_Xpert$`% Above` <- round(CAD_Xpert$`% Above`, 2)
+
+CAD_Xpert <- CAD_Xpert[, c(16, 21, 14, 13, 15, 22:25)]
+
+# write.csv(CAD_Xpert, "Supp_table.csv")
+```

@@ -1,0 +1,22 @@
+---
+title: "Missing Received"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+BGD8168 <- read.delim("BGD8168List.txt", header = FALSE, sep = " ")
+BGD8168 <- as.data.frame(BGD8168[, 13])
+colnames(BGD8168)[1] <- "TID"
+QA.BGD <- as.data.frame(QA.BGD[, 1])
+colnames(QA.BGD)[1] <- "TID"
+QAdf2 <- rbind(BGD8168, QA.BGD)
+
+# in delft but not in QAdf2
+stillMissing <-  subset(CAD6_delft, !(CAD6_delft$TID_Delft %in% QAdf2$TID))
+# in delft but not in QA.BGD
+stillMissing2 <-  subset(CAD6_delft, !(CAD6_delft$TID_Delft %in% QA.BGD$TID))
+# in missing but not in BGD8168 
+stillMissing3 <- subset(Missing, !(Missing$TID_OMRS %in% BGD8168$TID))
+length(Missing$TID_OMRS)-length(BGD8168$TID)
+```
+

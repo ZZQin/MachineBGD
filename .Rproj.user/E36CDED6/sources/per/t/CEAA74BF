@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1559299577640.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4161162257",
+    "id" : "CEAA74BF",
+    "lastKnownWriteTime" : 1559567756,
+    "last_content_update" : 1559567756028,
+    "path" : "C:/Users/zzq/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/CAR-Bangladesh/CAR_BGD/DataCleaning.R",
+    "project_path" : "DataCleaning.R",
+    "properties" : {
+        "cursorPosition" : "58,48",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

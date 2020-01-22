@@ -1,0 +1,9 @@
+"0","# Choose the DL System
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% ""CAD4TB"", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% ""IF2"", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% ""JF1"", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% ""Lunit"", ]
+SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% ""qXR"", ]
+"
+"2","Error: object 'SubgroupPlotOrigin' not found
+"

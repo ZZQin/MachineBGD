@@ -1,0 +1,138 @@
+---
+title: "Draft"
+author: "Zhi Zhen Qin"
+output: 
+  word_document
+    # reference_docx: C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/10 Manuscript/3 Nepal_Cameroon/Deep Learning CXR Compare - Submission SR_ZZ.docx
+
+---
+
+```{r Global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=15, fig.height=12, echo=FALSE, warning=FALSE, message=FALSE)
+library(moments)
+```
+  
+# Introduction
+The improved theoretical understanding in AI technology, the ubiquity of large annotated datasets, and the advance in computer power have fostered a rapid expansion of the AI industry in medical diagnosis.
+  
+Until recently, the most accurate AI methods for image analysis involved painstaking feature engineering, which requires manual image pre-processing, segmenting anatomic structures, and detecting or computing features suggested by an expert. The breakthrough in the ImageNet 2012 Challenges popularized the use of deep learning in neural networks to analyse medical images. Inspired by the human nervous system, neural networks are interconnected functions, each comprised of a weight and a bias coefficient. In deep learning, the networks are trained using large sets of known positive and negative data (ground truth) in multiple hidden layers. The networks “learn” by adjusting the weights and biases of the underlying functions based on the difference between predictions and ground, a process called back-propagation. The increased computational power makes it possible for a complex deep learning network to modify itself using a large training dataset so that the resulting trained algorithms can identify new and unseen data. 
+
+These AI algorithms provide opportunities for new solutions to tackle tuberculosis (TB), a disease kills more people world-wide than any single infectious disease. Immediately identifying TB presumptives or patients is critical to prevent further spread of the infection. Chest x-ray is recommended by the World Health Organization (WHO) as a screening and triage test prior to the use of Xpert MTB/RIF. However, there is a lack of qualified radiologists who can quickly read CXR films in many high TB burden countries. Several AI companies have emerged in recent years promising to quickly screen digital chest-radiographs to identify people in need of further diagnostic testing for TB. 
+
+However, like most AI algorithms, no one knows how exactly the resulting algorithms work, not even the engineers who developed them, earning AI the “black boxes” reputation. Companies are not eager to share how exactly they built their algorithms as this is extremely valuable and it is a fiercely guarded trade secret. Often the marketed accuracy is done on the same data superset for training, testing and validation and cannot be generalized to other setting. Current scientific evidence is limited and mostly available for one product, CAD4TB (Delft Imaging Systems, Netherlands). However, significant changes have been made to the latest version (v6) of CAD4TB and it has limited publication. There is only one peer-reviewed publication on the performance of other DL systems for detecting TB abnormalities with a relatively small dataset. WHO has not made a recommendation on the use of automated reading systems for TB due to the current lack of evidence [WHO]. In response to this, we evaluated multiple DL systems available for TB screening and triage using a large dataset unseen by any AI developers to help National TB Programmes, medical professionals and patients to assess the true diagnostics accuracy of these algorithms.
+
+
+# Methods
+  
+## Summary of DL Systems 
+Through the network and the database of innovators developed under the TB REACH initiatives and the Accelerator for Impact project at Stop TB Partnership, we identified and contacted 15 (? TBC) DL system vendors regarding their interest in participating in the evaluation. Five AI products with stable version control were included in this study: CAD4TB (version 6), qXR (version 1) developed by Qure.ai (India), Lunit INSIGHT for Chest Radiography (Version 4.7.2) developed by Lunit (South Korea), JF CXR-1 developed by JF Healthcare (China) and InferRead®DR by Infervision (China). 
+
+We used the latest versions available of the five DL systems in this evaluation. Both CAD4TB and Lunit read DICOM (Digital Imaging and Communications in Medicine) format only, while qXR can parse digital radiographs stored in PNG and JPEG. CAD4TB detects TB-specific abnormalities and outputs continuous abnormality scores ranging from 0 to 100. The greater the abnormality score, the higher probability of having TB. Current versions of qXR and Lunit detect several discrete pulmonary abnormalities, such as calcification, cavitation, opacities etc. Both systems present the final results for TB and the specific clinical abnormalities in binary (“Yes” / “No”) using a pre-defined threshold abnormality score. The abnormality scores for Lunit and qXR range from 0 to 100%. The default threshold abnormality score can be tuned based on screening requirements. All five DL systems can generate heat maps showing abnormalities. 
+
+
+## Study Setting and Population
+With funding from the Stop TB Partnership’s TB REACH initiative, three TB Screening Centres (SCs) were established across Dhaka with a referral network of more than 2,000 private providers and 133 NTP facilities. The TB SCs were also open to walk-in clients with no referral history. Adults (> 15 years) presenting at any of the TB SCs were consecutively enrolled and were verbally screened for the presence of TB symptoms between 15 May 2014 and 4 October 2016. After providing informed consent, each participant received a posterior-anterior CXR using digital X-ray machines (Delft EZ DR X-ray) and was asked to submit a sputum sample for a free Xpert test. Xpert test was performed again if the initial test failed (invalid, error, or no result). Demographic, symptom and medical history data were collected using OpenMRS. 
+
+A group of 3 Bangladeshi, board-certified radiologists (all with MD/MBSS degree in radiology and X,Y,Z years of experience??) read all of the CXR images remotely. The radiologists were blinded to all testing and clinical (and demographic data?? icddr,b please confirm) data and provided standard radiology reports and graded each CXR as follows (criteria to be attached): a. Highly Suggestive: including highly suggestive of TB only, b. Possibly TB: including abnormality highly suggestive of TB and possibly associated with TB, c. Any Abnormality: including abnormality highly suggestive of TB, possibly associated with TB and non-TB abnormality, d. Normal. Anyone who was unable or unwilling to acquire a CXR was referred to a nearby public-sector health facility. The 5 DL systems scored the images remotely through Secured File Transfer Protocol from the Stop TB repository except for Delft, in which case the data was shared through cloud transfer. All machine reading was performed independently with the developers blinded to all testing, clinical and demographic data.
+  
+
+## Data Analysis
+We used bacteriologically-confirmed TB outcomes tested with Xpert MTB/RIF to evaluate the accuracy of the 5 DL systems as well the decisions of the Bangladeshi radiologists. We plotted and describe the distribution of DL systems’ abnormality scores disaggregated by Xpert status and prior history of TB. Mann-Whitney U test was used to compared non-normal distribution.
+
+We compared the performance of the 5 DL system to that of radiologists by selecting AI scores that match the sensitivity of the certified radiologists and compared the difference in specificity. We used the McNemar test on paired proportions to test if the difference in specificity of human readers and the 5 DL systems. 
+
+We evaluated and compared the overall performance of the 5 DL systems using threshold-free measurements. In additional to the area under receiver operating characteristic (ROC) curves (AUC), which shows the tradeoff between sensitivity and specificity with varying thresholds, we also calculated and compared the area under Precision-Recall (PRC) curve (PRAUC), which shows precision values for corresponding sensitivity values and is more informative than the ROC curve when evaluating binary classifier on imbalanced datasets. [Saito 2015]. We also plotted sensitivity, specificity, and PPV with varying AI scores to understand the influence of the selection of cutoff threshold scores on programmatic performance. We plotted the proportion of Xpert saved  against sensitivity to understand the sensitivity loss as further testing is triaged 
+
+Furthermore, we divided the test set by patient age, prior TB history and referral types to evaluate the performance of the 5 DL systems in each subpopulation in terms of AUC and PRAUC.
+
+## Ethics
+All enrolled participants provided informed written consent. The study protocol was reviewed and approved by the Research Review Committee and the Ethical Review Committee at the International Centre for Diarrhoeal Disease Research, Bangladesh (icddr,b).
+
+## Role of the AI Developers
+The AI developers had no role in study design, data collection, analysis plan, or writing of the study. The developers only had access to the CXR images, and did not receive any of the demographic, symptom, medical, or testing data of the participants. 
+
+
+# Results
+
+```{r Load, warning=FALSE, results='hide'}
+source("Chapter/table1.R")
+```
+  
+A total of `r  length(MDF$X)` people were consecutively recruited from the three TB SCs. Excluding `r sum(is.na(MDF$rad.abn)==T)` individuals without a CXR and `r sum(MDF$Age<15)` individuals aged 15 or less, a total of `r sum(MDF$Age>=15)`  individuals were included in this analysis. The median age was `r T1$Overall[2]`, and the ratio between female and male participants was `r T1$Overall[3]`. Most participants `r T1$Overall[4]`,  reported coughing more than 14 days (or any cough? icddr,b please check), `r T1$Overall[5]` reported fever, `r T1$Overall[7]` reported weight loss; about half reported shortness of breath `r T1$Overall[6]`; `r  T1$Overall[8]` reported hemoptysis; and `r T1$Overall[10]` had prior TB medication history. Almost all, `r T1$Overall[9]` had at least one TB-related symptom. There are three sources of patients: the greatest proportion of test results came from people who were referred by their private provider (n=`r T1$Overall[24]`);  `r T1$Overall[25]` were referred from NTP facilities after a negative smear; and `r T1$Overall[26]` individuals walked-in / self-presented (Table 1).
+
+Across all referral groups,  `r T1$Overall[11]` MTB-positive TB patients were detected; the prevalence of Xpert positive TB was lowest among walk-ins: `r T1$WalkIn[11]` compared with `r T1$Private[11]` and `r T1$Public[11]` for other referral groups. Among people with MTB-positive results, `r percent(sum(MDF$RIF.Result %in% "Detected")/sum(MDF$Xpert2Outcome_num %in% "1"))` were resistant to rifampicin. The radiologists graded `r T1$Overall[27]` as Highly Suggestive, `r T1$Overall[28]` as Possibly TB, `r T1$Overall[29]` as Any Abnormality. The medians of the abnormality scores in Xpert positive groups were significantly different from those in the Xpert negative groups were (Mann-Whitney U test <0.05) for all 5 DL systems. 
+
+### Histogram 
+
+![](Results/Histogram.tif){width=900px}
+
+The histograms of the abnormality scores of the 5 DL systems were disaggregated by Xpert outcomes and prior TB history (Figure 1). The distributions of the scores in Xpert positive group were heavily left-skewed with JF CXR-1 having the highest left skewness `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),4)` and CAD4TB having the lowest left skewness `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 27]),4)`. As expected the distributions in Xpert negative group were right-skewed except for CAD4TB with a left skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 27]),4)`, and Infervision has the highest right skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),4)`. Noticeably, there are many distinct outliers: the far right side of the JF CXR-1's distribution in the Xpert negative group (score 90-100) and qXR in the Xpert negative group (score 70-90), far left sides of Lunit's and JF CXR-1's distribution in the Xpert negative group (score 0-10). Those with TB history but Xpert negative without in generally still have a high AI scores, especially in the case of JF CXR-I (the dark red bar), which we postulated resulted from issues in the algorithms' ability to differentiate between old scarring and active lesion. 
+
+### Comparison with human readers
+```{r}
+source("radiologist.R")
+humanAI <- read.csv("Results/HumanAI.csv")
+knitr::kable(humanAI[c(1,4,7,10,13, 2,5,8,11,14, 3,6,9,12,15), ], row.names = F)
+
+# Any abnormality
+MDF$DL <- "negative"
+MDF$DL[MDF$CAD4TB6>= humanAI[humanAI$human.benchmark %in% "Any Abnormality" & humanAI$DL.System %in% "CAD4TB", 5]] <- "positive"
+```
+
+
+If all patients with a chest x-ray graded as highly suggestive of TB by the radiologists had been tested by Xpert, the resulting sensitivity and specificity would be `r paste0(percent(Radiologist$Sens[1]), ", 95CI: (", percent(Radiologist$Sens_L[1]), " - ", percent(Radiologist$Sens_H[1]),")")` and `r paste0(percent(Radiologist$Spec[1]), ", 95CI: (", percent(Radiologist$Spec_L[1]), " - ", percent(Radiologist$Spec_H[1]),")")`. When approximate the sensitivity of this classification made by human readers, all 5 DL systems demonstrated statistically significant improvement in specificity (improvement ranging from 1.48% - 8.96%).     
+
+If radiologists' rading of "Possibly TB" had been used to triage the follow-on Xpert testing, the resulting sensitivity would be `r paste0(percent(Radiologist$Sens[2]), ", 95CI: (", percent(Radiologist$Sens_L[2]), " - ", percent(Radiologist$Sens_H[2]), ")")` and the specificity would be `r paste0(percent(Radiologist$Spec[2]), ", 95CI: (", percent(Radiologist$Spec_L[2]), " - ", percent(Radiologist$Spec_H[2]), ")")`. The matching AI classificiation by the 5 DL systems showed statistical improvement in specificty (improvement ranging from 1.34% - 7.62%). 
+
+The grading of Possibly TB" would have a sensitivity of `r paste0(percent(Radiologist$Sens[3]), ", 95CI: (", percent(Radiologist$Sens_L[3]), " - ", percent(Radiologist$Sens_H[3]), ")")` and specificity of `r paste0(percent(Radiologist$Spec[3]), ", 95CI: (", percent(Radiologist$Spec_L[3]), " - ", percent(Radiologist$Spec_H[3]), ")")`.
+
+Compared to the the human radiologists' grading encompassing any abnormality, the AI system demonstrated a statistically significant improvement in absolute specificity of 1.2% (95% confidence interval (CI) 0.29%, 2.1%; P = 0.0096 for superiority) and an improvement in absolute sensitivity of 2.7% (95% CI −3%, 8.5%; Extended Data Table 2a).
+
+
+###  ROC Curves
+
+![](Results/Figure-2 ROCs.tif){width=900px}
+The ROC graph shows that regardless of the CAD4TB cut-off value selected, the software’s performance was inferior compared to the radiologist among all referral groups. The area under the curve (AUC) for all referral groups is 0.74 (95% CI: 0.73-0.75). The CAD4TB software performed significantly better among walk-ins (AUC 0.84, 95% CI: 0.81-0.87) compared to people referred from NTP facilities (AUC 0.77, 95% CI: 0.74-0.79) and private providers (AUC 0.72, 95% CI: 0.70-0.73).
+  
+
+###  Precision Recall Curve (Xpert Reference) 
+```{r PRC precrec, eval=F}
+library(precrec)
+library(ggplot2)
+
+score <- as.list(data.frame(t(as.data.frame(matrix(MDF_long$AbnormalityScore, ncol = 24031, byrow = T)))))
+label <- as.list(data.frame(t(as.data.frame(matrix(MDF_long$Xpert2Outcome_num, ncol = 24031, byrow = T)))))
+# Explicitly specify model names
+# msmdat <- mmdata(score, label, modnames = c("CAD4TB", "qXR", "Lunit",  "JF1", "JF2", "Infervision 1", "Infervision 2", "Infervision 3"), dsids = c(1:8))
+msmdat <- mmdata(score, label, modnames = c("CAD4TB", "qXR", "Lunit",  "JF CXR-1", "Infervision 2"), dsids = c(1:5))
+mmcurves <- evalmod(msmdat)
+# Get a data frame with AUC scores
+  attr <- attributes(evalmod(scores = MDF$CAD4TB6, labels = MDF$Xpert2Outcome_num))
+  print(paste("CAD4TB= ", round(attr$auc[4],3)))
+  attr <- attributes(evalmod(scores = MDF$qXRv2, labels = MDF$Xpert2Outcome_num))
+  print(paste("qXR= ", round(attr$auc[4],3)))
+  attr <- attributes(evalmod(scores = MDF$LunitScore, labels = MDF$Xpert2Outcome_num))
+  print(paste("Lunit= ", round(attr$auc[4],3)))
+  attr <- attributes(evalmod(scores = MDF$JF1, labels = MDF$Xpert2Outcome_num))
+  print(paste("JF1= ", round(attr$auc[4],3)))
+  attr <- attributes(evalmod(scores = MDF$IF2, labels = MDF$Xpert2Outcome_num))
+  print(paste("Infervision= ", round(attr$auc[4],3)))
+
+autoplot(mmcurves) 
+
+# autoplot(mmcurves, show_cb = TRUE)
+rm(score, label)
+```
+  
+
+![](Results/4 Curves.tif){width=900px}
+  
+### Results across age and prior TB history
+
+
+![](Results/AUC plot.tif){width=900px}
+
+We observe that the performance of XXX PRODUCTS varies across age groups. We also find that all DL systems perform worse on XXX than on, which is consistent with the decreased sensitivity of radiologists for patients... Differences in the model’s performance in benign/not benign classification is larger than in malignant/not malignant classification. We hypothesize that this is due to age and prior TB hisotry there are more abnormality on the chest or old scaring influenced the detection of active TB. 
+
+
+  

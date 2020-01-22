@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1579707398219.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1500929616",
+    "id" : "25C2F530",
+    "lastKnownWriteTime" : 1579707447,
+    "last_content_update" : 1579707447409,
+    "path" : "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/CAR-Bangladesh/ProjectMachineBGD/CAR_BGD/CutoffTable.R",
+    "project_path" : "CutoffTable.R",
+    "properties" : {
+        "cursorPosition" : "425,13",
+        "scrollLine" : "414"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
