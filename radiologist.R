@@ -88,17 +88,17 @@ Human <- rbind(Human, Human, Human, Human, Human)
 AI <- CAD_Xpert_plot[CAD_Xpert_plot$Comment !="" , c(2, 3, 9, 18, 19, 23)]
 AI$Subject <- paste(AI$DeepLearningSystem, AI$Comment)
 require(data.table)
-# AI <- as.data.table(AI)
+AI <- as.data.table(AI)
 # # knitr::kable(AI[AI[, .I[which.max(Spec)], by=Subject]$V1])
-# AI <- AI[AI[, .I[which.max(Spec)], by=Subject]$V1]
-# # Radiologist[grep("Probably", Radiologist$AccuracyTableCategory), c(8:11)]
-# humanAI <- cbind(Human, AI[, c(1,2,4, 5, 3)])
-# humanAI$Diff <- percent(humanAI[, 9]- humanAI[, 4])
-# humanAI <- humanAI[, c(1,2,3,5:8, 10)]
-# colnames(humanAI) <- c("human benchmark", "sensitivity", "specificy", "DL System", "AIScore", "sensitivity", "specificy", "Diff specificity")
+AI <- AI[AI[, .I[which.max(Spec)], by=Subject]$V1]
+# Radiologist[grep("Probably", Radiologist$AccuracyTableCategory), c(8:11)]
+humanAI <- cbind(Human, AI[, c(1,2,4, 5, 3)])
+humanAI$Diff <- percent(humanAI[, 9]- humanAI[, 4])
+humanAI <- humanAI[, c(1,2,3,5:8, 10, 9,4)]
+colnames(humanAI) <- c("human benchmark", "sensitivity", "specificy", "DL System", "AIScore", "sensitivity", "specificy", "Diff specificity", "specAI", "specH")
 
 # write.csv(humanAI, "Results/humanAI.csv", row.names = F)
-# 
+#
 # rm(AI, Human)
 
 

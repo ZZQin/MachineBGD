@@ -1,4 +1,0 @@
-"0","table1 <- CreateTableOne(vars = listVar, strata=c(""Xpert2Outcome_num""), data = MDF, factorVars = catVars)
-"
-"2","Error in as.vector(x) : object 'listVar' not found
-"
