@@ -97,19 +97,21 @@ humanAI$Diff <- percent(humanAI[, 9]- humanAI[, 4])
 humanAI <- humanAI[, c(1,2,3,5:8, 10, 9,4)]
 colnames(humanAI) <- c("human benchmark", "sensitivity", "specificy", "DL System", "AIScore", "sensitivity", "specificy", "Diff specificity", "specAI", "specH")
 
-# write.csv(humanAI, "Results/humanAI.csv", row.names = F)
-#
-# rm(AI, Human)
-
 
 ### McNemar test specificity 
 healthy <- sum(MDF$Xpert2Outcome_num %in% "0")
 
-library(readr)
-humanAI <- read_csv("Results/humanAI.csv", 
-                    col_types = cols(`Diff.specificity` = col_number()))
+# library(readr)
+# humanAI <- read_csv("Results/humanAI.csv", 
+#                     col_types = cols(`Diff.specificity` = col_number()))
+humanAI$CI <- ""
 
-test <- prop.test(x=c(healthy*(Radiologist$Spec[1]+humanAI$Diff.specificity[1]/100), healthy*Radiologist$Spec[1]), n=c(healthy, healthy))
-str(test)
-test$estimate
+for (i in 1:15){
+  test <- prop.test(x=c(humanAI$specAI[i]*healthy, healthy*humanAI$specH[i]), n=c(healthy, healthy))
+  humanAI$CI[i] <- paste0(percent(test$conf.int[1]), " - ", percent(test$conf.int[2]))
+  # return(humanAI)
+}
+# humanAI$CI
+write.csv(humanAI, "Results/humanAI.csv", row.names = F)
+rm(AI, Human)
 
