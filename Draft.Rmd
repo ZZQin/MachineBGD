@@ -23,23 +23,13 @@ However, like most AI algorithms, no one knows how exactly the resulting algorit
 
 
 # Methods
+With funding from the Stop TB Partnership’s TB REACH initiative, three TB Screening Centres (SCs) were established across Dhaka with a referral network of more than 2,000 private providers and 133 NTP facilities. Health providers in the network refer presumptive TB patients to the SCs to screen and test for TB. Public health facilities only refer the people with a negative smear microscopy but still suspected of having TB to the SCs. The TB SCs also receive walk-in clients with no referral history. 
+
+We consecutively enrolled all adults (> 15 years) presenting at any of the TB SCs between 15 May 2014 and 4 October 2016. After providing informed consent, each participant was verbally screened for symptoms and received a posterior-anterior CXR using digital X-ray machines (Delft EZ DR X-ray) and was asked to submit a sputum sample for a free Xpert test. Xpert test was performed again if the initial test failed (invalid, error, or no result). The final Xpert results were used as the bacteriological evidence and the refernece standard in this evaluation. A group of 3 Bangladeshi, board-certified radiologists (all with MD/MBSS degree in radiology and X,Y,Z years of experience??) read all of the CXR images remotely. The radiologists were blinded to all testing and clinical (and demographic data?? icddr,b please confirm) data and provided standard radiology reports and graded each CXR as follows (criteria to be attached): a. Highly Suggestive: including highly suggestive of TB only, b. Possibly TB: including abnormality highly suggestive of TB and possibly associated with TB, c. Any Abnormality: including abnormality highly suggestive of TB, possibly associated with TB and non-TB abnormality, d. Normal. Anyone who was unable or unwilling to acquire a CXR was referred to a nearby public-sector health facility. 
+
+Through the network and the database of innovators developed under the TB REACH initiatives and the Accelerator for Impact project at Stop TB Partnership, we identified and selected five DL systems with stable version control to be included included in this study: CAD4TB (version 6), qXR (version 1) developed by Qure.ai (India), Lunit INSIGHT for Chest Radiography (Version 4.7.2) developed by Lunit (South Korea), JF CXR-1 developed by JF Healthcare (China) and InferRead®DR by Infervision version 2 (China).We used the latest versions available of the five DL systems in this evaluation. Current versions of qXR and Lunit detect several discrete pulmonary abnormalities, such as calcification, cavitation, opacities etc. (to be updated with landscaping results). All five DL systems can generate heat maps showing abnormalities. The 5 DL systems scored the images remotely through Secured File Transfer Protocol from the Stop TB repository except for Delft, in which case the data was shared through cloud transfer. All machine reading was performed independently with the developers blinded to all testing, clinical and demographic data.  
   
-## Summary of DL Systems 
-Through the network and the database of innovators developed under the TB REACH initiatives and the Accelerator for Impact project at Stop TB Partnership, we identified and contacted 15 (? TBC) DL system vendors regarding their interest in participating in the evaluation. Five AI products with stable version control were included in this study: CAD4TB (version 6), qXR (version 1) developed by Qure.ai (India), Lunit INSIGHT for Chest Radiography (Version 4.7.2) developed by Lunit (South Korea), JF CXR-1 developed by JF Healthcare (China) and InferRead®DR by Infervision (China). 
-
-We used the latest versions available of the five DL systems in this evaluation. Both CAD4TB and Lunit read DICOM (Digital Imaging and Communications in Medicine) format only, while qXR can parse digital radiographs stored in PNG and JPEG. CAD4TB detects TB-specific abnormalities and outputs continuous abnormality scores ranging from 0 to 100. The greater the abnormality score, the higher probability of having TB. Current versions of qXR and Lunit detect several discrete pulmonary abnormalities, such as calcification, cavitation, opacities etc. Both systems present the final results for TB and the specific clinical abnormalities in binary (“Yes” / “No”) using a pre-defined threshold abnormality score. The abnormality scores for Lunit and qXR range from 0 to 100%. The default threshold abnormality score can be tuned based on screening requirements. All five DL systems can generate heat maps showing abnormalities. 
-
-
-## Study Setting and Population
-With funding from the Stop TB Partnership’s TB REACH initiative, three TB Screening Centres (SCs) were established across Dhaka with a referral network of more than 2,000 private providers and 133 NTP facilities. The TB SCs were also open to walk-in clients with no referral history. Adults (> 15 years) presenting at any of the TB SCs were consecutively enrolled and were verbally screened for the presence of TB symptoms between 15 May 2014 and 4 October 2016. After providing informed consent, each participant received a posterior-anterior CXR using digital X-ray machines (Delft EZ DR X-ray) and was asked to submit a sputum sample for a free Xpert test. Xpert test was performed again if the initial test failed (invalid, error, or no result). Demographic, symptom and medical history data were collected using OpenMRS. 
-
-A group of 3 Bangladeshi, board-certified radiologists (all with MD/MBSS degree in radiology and X,Y,Z years of experience??) read all of the CXR images remotely. The radiologists were blinded to all testing and clinical (and demographic data?? icddr,b please confirm) data and provided standard radiology reports and graded each CXR as follows (criteria to be attached): a. Highly Suggestive: including highly suggestive of TB only, b. Possibly TB: including abnormality highly suggestive of TB and possibly associated with TB, c. Any Abnormality: including abnormality highly suggestive of TB, possibly associated with TB and non-TB abnormality, d. Normal. Anyone who was unable or unwilling to acquire a CXR was referred to a nearby public-sector health facility. The 5 DL systems scored the images remotely through Secured File Transfer Protocol from the Stop TB repository except for Delft, in which case the data was shared through cloud transfer. All machine reading was performed independently with the developers blinded to all testing, clinical and demographic data.
-  
-
-## Data Analysis
-We used bacteriologically-confirmed TB outcomes tested with Xpert MTB/RIF to evaluate the accuracy of the 5 DL systems as well the decisions of the Bangladeshi radiologists. We plotted and describe the distribution of DL systems’ abnormality scores disaggregated by Xpert status and prior history of TB. Mann-Whitney U test was used to compared non-normal distribution.
-
-We compared the performance of the 5 DL system to that of radiologists by selecting AI scores that match the sensitivity of the certified radiologists and compared the difference in specificity. We used the McNemar test on paired proportions to test if the difference in specificity of human readers and the 5 DL systems. 
+All DL systems produce a continuous score (from 0 to 100 or from 0% to 100%) presenting the probability of presence of TB based on their DL algorithms. We assess the 5 DL systems firstly by describing the distribution of AI scores disaggregated by Xpert status and by prior history of TB. Mann-Whitney U test was used to compared non-normal distribution. Some vendors provide binary (“Yes” / “No”) for TB using a pre-defined threshold score. We choose the threshold cutoff to be comparative to the three categories used by the human readers (reading criteria described below). For example, for highly suggestive of TB, we chose the cutoff score to produce the same dichotomized screening decisions in terms of sensitivity and we compare the difference in specificity using McNemar test for paired proportions.
 
 We evaluated and compared the overall performance of the 5 DL systems using threshold-free measurements. In additional to the area under receiver operating characteristic (ROC) curves (AUC), which shows the tradeoff between sensitivity and specificity with varying thresholds, we also calculated and compared the area under Precision-Recall (PRC) curve (PRAUC), which shows precision values for corresponding sensitivity values and is more informative than the ROC curve when evaluating binary classifier on imbalanced datasets. [Saito 2015]. We also plotted sensitivity, specificity, and PPV with varying AI scores to understand the influence of the selection of cutoff threshold scores on programmatic performance. We plotted the proportion of Xpert saved  against sensitivity to understand the sensitivity loss as further testing is triaged 
 
@@ -66,19 +56,23 @@ Across all referral groups,  `r T1$Overall[11]` MTB-positive TB patients were de
 
 ![](Results/Histogram.tif){width=900px}
 
-The histograms of the abnormality scores of the 5 DL systems were disaggregated by Xpert outcomes and prior TB history (Figure 1). The distributions of the scores in Xpert positive group were heavily left-skewed with JF CXR-1 having the highest left skewness `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),4)` and CAD4TB having the lowest left skewness `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 27]),4)`. As expected the distributions in Xpert negative group were right-skewed except for CAD4TB with a left skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 27]),4)`, and Infervision has the highest right skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),4)`. Noticeably, there are many distinct outliers: the far right side of the JF CXR-1's distribution in the Xpert negative group (score 90-100) and qXR in the Xpert negative group (score 70-90), far left sides of Lunit's and JF CXR-1's distribution in the Xpert negative group (score 0-10). Those with TB history but Xpert negative without in generally still have a high AI scores, especially in the case of JF CXR-I (the dark red bar), which we postulated resulted from issues in the algorithms' ability to differentiate between old scarring and active lesion. 
+The distributions of the 5 DL systems' scores disaggregated by Xpert outcomes and prior TB history (Figure 1) were distinct, suggesting the algorithms are constructed differently. In terms of the segregation of Xpert positive and negative individuals, JF CXR-1's scores of Xpert positive were heavily left-skewed (skewness = `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),3)`, the green bars in Figure 1); whereas the Xpert positive individuals' CAD4TB scores were lest left skewed (skewness= `r round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 27]),3)`), but still almost all above 50%. There were some noticeable outliers in the Xpert positive group whose AI scores were unexpectedly low, which represents true positive patients being missed or reduced sensitivity. 
 
-### Comparison with human readers
+There were many Xpert negative individuals have relatively high probablity scores. Noticeably some unexpectively had very high score (90-100) when read by JF CXR-1. 
+As expected the distributions in Xpert negative group were right-skewed except for CAD4TB with a left skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 27]),4)`, and Infervision has the highest right skewness of `r round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),3)`. 
+
+Noticeably, there are many distinct outliers: the far right side of the JF CXR-1's distribution in the Xpert negative group (score 90-100) and qXR in the Xpert negative group (score 70-90), far left sides of Lunit's and JF CXR-1's distribution in the Xpert negative group (score 0-10). Those with TB history but Xpert negative without in generally still have a high AI scores, especially in the case of JF CXR-I (the dark red bar), which we postulated resulted from issues in the algorithms' ability to differentiate between old scarring and active lesion. 
+
+### Comparison of sensitivity and specificity between human reading and the predictions of the DL systems
 ```{r}
 source("radiologist.R")
-humanAI <- read.csv("Results/HumanAI.csv")
-knitr::kable(humanAI[c(1,4,7,10,13, 2,5,8,11,14, 3,6,9,12,15), ], row.names = F)
+humanAI <- read.csv("Results/HumanAI.csv", )
+humanAI <- humanAI[c(3,6,9,12,15, 2,5,8,11,14, 1,4,7,10,13), -c(7, 9, 10)]
 
-# Any abnormality
-MDF$DL <- "negative"
-MDF$DL[MDF$CAD4TB6>= humanAI[humanAI$human.benchmark %in% "Any Abnormality" & humanAI$DL.System %in% "CAD4TB", 5]] <- "positive"
+knitr::kable(humanAI, row.names = F)
 ```
 
+Thresholds were chosen to match or exceed the performance of each human reader’s categories. 
 
 If all patients with a chest x-ray graded as highly suggestive of TB by the radiologists had been tested by Xpert, the resulting sensitivity and specificity would be `r paste0(percent(Radiologist$Sens[1]), ", 95CI: (", percent(Radiologist$Sens_L[1]), " - ", percent(Radiologist$Sens_H[1]),")")` and `r paste0(percent(Radiologist$Spec[1]), ", 95CI: (", percent(Radiologist$Spec_L[1]), " - ", percent(Radiologist$Spec_H[1]),")")`. When approximate the sensitivity of this classification made by human readers, all 5 DL systems demonstrated statistically significant improvement in specificity (improvement ranging from 1.48% - 8.96%).     
 
@@ -96,34 +90,6 @@ The ROC graph shows that regardless of the CAD4TB cut-off value selected, the so
   
 
 ###  Precision Recall Curve (Xpert Reference) 
-```{r PRC precrec, eval=F}
-library(precrec)
-library(ggplot2)
-
-score <- as.list(data.frame(t(as.data.frame(matrix(MDF_long$AbnormalityScore, ncol = 24031, byrow = T)))))
-label <- as.list(data.frame(t(as.data.frame(matrix(MDF_long$Xpert2Outcome_num, ncol = 24031, byrow = T)))))
-# Explicitly specify model names
-# msmdat <- mmdata(score, label, modnames = c("CAD4TB", "qXR", "Lunit",  "JF1", "JF2", "Infervision 1", "Infervision 2", "Infervision 3"), dsids = c(1:8))
-msmdat <- mmdata(score, label, modnames = c("CAD4TB", "qXR", "Lunit",  "JF CXR-1", "Infervision 2"), dsids = c(1:5))
-mmcurves <- evalmod(msmdat)
-# Get a data frame with AUC scores
-  attr <- attributes(evalmod(scores = MDF$CAD4TB6, labels = MDF$Xpert2Outcome_num))
-  print(paste("CAD4TB= ", round(attr$auc[4],3)))
-  attr <- attributes(evalmod(scores = MDF$qXRv2, labels = MDF$Xpert2Outcome_num))
-  print(paste("qXR= ", round(attr$auc[4],3)))
-  attr <- attributes(evalmod(scores = MDF$LunitScore, labels = MDF$Xpert2Outcome_num))
-  print(paste("Lunit= ", round(attr$auc[4],3)))
-  attr <- attributes(evalmod(scores = MDF$JF1, labels = MDF$Xpert2Outcome_num))
-  print(paste("JF1= ", round(attr$auc[4],3)))
-  attr <- attributes(evalmod(scores = MDF$IF2, labels = MDF$Xpert2Outcome_num))
-  print(paste("Infervision= ", round(attr$auc[4],3)))
-
-autoplot(mmcurves) 
-
-# autoplot(mmcurves, show_cb = TRUE)
-rm(score, label)
-```
-  
 
 ![](Results/4 Curves.tif){width=900px}
   
