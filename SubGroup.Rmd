@@ -59,6 +59,18 @@ SubgroupPlot <- read.csv("Chapter/Subgroup Table/SubgroupTable.csv")
 SubgroupPlot <- SubgroupPlot[, -1]
 SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"] <- SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"]/100
 SubgroupPlotOrigin <- SubgroupPlot
+SubgroupPlot <- SubgroupPlotOrigin
+SubgroupPlot$subgroup <- as.character(SubgroupPlot$subgroup)
+
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "New"] <- "1.Without prior TB history"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Old"] <- "2.With prior TB history"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Young"] <- "3.Young [15,25)"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Middle"] <- "4.Middle age [25,60)"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Senior"] <- "5.Old age [60,108]"
+# SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% ""] <-
+# SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% ""] <-
+SubgroupPlot$subgroup <- as.factor(SubgroupPlot$subgroup)
+
 
 # Choose the DL System
 # SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "CAD4TB", ]

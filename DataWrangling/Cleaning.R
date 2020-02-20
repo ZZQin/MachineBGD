@@ -180,6 +180,8 @@ MDF <- MDF[, -c(3,4)]
 Master_df <- read.csv("AI Scores/Master_df.csv")
 MDF$Referral <- Master_df$type[match(MDF$PID_OMRS, Master_df$PID)]
 
+# Referral <- read.csv("DataWrangling/referral_source.csv")
+
 write.csv(MDF, "DataWrangling/MDF.csv")
 # rm(DOTS, Master_df_V5, Master_df_valid, Private_provider, Self, V5_only, CAD.cost, Radiologist.cost, Xpert.cost)
 
