@@ -1,0 +1,21 @@
+slides > slide {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+.gdbar img {
+  width: 400px !important;
+  height: 100px !important;
+  margin: 8px 8px;
+}
+
+.gdbar {
+  width: 500px !important;
+  height: 125px !important;
+}
+
+slides > slide:not(.nobackground):before {
+  width: 100px;
+  height: 25px;
+  background-size: 100px 25px;
+}

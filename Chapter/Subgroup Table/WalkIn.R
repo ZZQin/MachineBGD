@@ -3,7 +3,7 @@ source("radiologist.R")
 Radiologist <- Radiologist[c(1:3), ]
 Private <- subset(MDF, MDF$Referral %in% "Private Provider")
 Public <- subset(MDF, MDF$Referral %in% "Public DOTS Facilities")
-WalkIn <- subset(MDF, MDF$Referral %in% "Walk-in")
+WalkIn <- subset(MDF, MDF$Referral %in% "Walkin")
 Missing <- subset(MDF, is.na(MDF$Referral)==T)
 
 ###### Qure.AI Score by 0.0001 #########

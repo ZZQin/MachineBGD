@@ -1,6 +1,6 @@
 ## Cutoff Table (Full)
-source("DataWrangling/GlobalOption.R")
-source("radiologist.R")
+# source("DataWrangling/GlobalOption.R")
+# source("radiologist.R")
 Radiologist <- Radiologist[c(1:3), ]
 
 

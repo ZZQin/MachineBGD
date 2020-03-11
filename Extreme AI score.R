@@ -92,21 +92,21 @@ CAD_Xpert_plot <- CAD_Xpert_plot[, -1]
 CAD_Xpert_plot2 <- CAD_Xpert_plot
 
 CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "CAD4TB", ]
-cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]
-length(MDF[MDF$CAD4TB < cutoff & MDF$Xpert2Outcome_num %in% "1", 2])
-MDF$CADMissed[MDF$CAD4TB < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by CAD4TB"
+cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]*100
+length(MDF[MDF$CAD4TB6 < cutoff & MDF$Xpert2Outcome_num %in% "1", 2])
+MDF$CADMissed[MDF$CAD4TB6 < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by CAD4TB"
 
-CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "IF2", ]
+CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "InferReadDR", ]
 cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]
-MDF$IF2Missed[MDF$IF2 < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by IF2"
+MDF$IF2Missed[MDF$IF2 < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by InferReadDR"
 
-CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "JF1", ]
+CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "JF CXR-1", ]
 cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]
-MDF$JF1Missed[MDF$JF1 < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by JF1"
+MDF$JF1Missed[MDF$JF1 < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by JF CXR-1"
 
-CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "Lunit", ]
+CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "Lunit INSIGHT CXR", ]
 cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]
-MDF$LunitMissed[MDF$LunitScore < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by Lunit"
+MDF$LunitMissed[MDF$LunitScore < cutoff & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by Lunit INSIGHT CXR"
 
 CAD_Xpert_plot <- CAD_Xpert_plot2[CAD_Xpert_plot2$DeepLearningSystem %in% "qXR", ]
 cutoff <- CAD_Xpert_plot$Score[which(abs(CAD_Xpert_plot$Sens -0.95)==min(abs(CAD_Xpert_plot$Sens -0.95)))]
@@ -122,7 +122,7 @@ MDF$Comment[MDF$Radiology.Result != "X-Ray Normal" & (is.na(MDF$CADMissed) == F 
 
 MDF$Comment[MDF$Radiology.Result == "X-Ray Normal" & (is.na(MDF$CADMissed) == F | is.na(MDF$IF2Missed) == F | is.na(MDF$JF1Missed) == F | is.na(MDF$LunitMissed) == F | is.na(MDF$qXRMissed) == F) & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by at least one AI and by human"
 
-MDF$count <- apply(MDF[, 46:50], 1, function(x) length(grep("Missed by", x)))
+MDF$count <- apply(MDF[, 45:49], 1, function(x) length(grep("Missed by", x)))
 
 
 MDF$Comment[MDF$Radiology.Result != "X-Ray Normal" & MDF$count>=2 & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by at least 2 AI but not by human "
@@ -132,20 +132,23 @@ MDF$Comment[MDF$Radiology.Result != "X-Ray Normal" & MDF$count>=3 & MDF$Xpert2Ou
 MDF$Comment[MDF$Radiology.Result == "X-Ray Normal" & MDF$count>=3 & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by at least 3 AI AND by human "
 
 MDF$Comment[MDF$Radiology.Result != "X-Ray Normal" & is.na(MDF$CADMissed) == F & is.na(MDF$IF2Missed) == F & is.na(MDF$JF1Missed) == F & is.na(MDF$LunitMissed) == F & is.na(MDF$qXRMissed) == F & MDF$Xpert2Outcome_num %in% "1"] <- "Missed by all AI but not by human"
-
 table(MDF$Comment)
 
 
 
-MDF$Comment <- ""
-MDF$Comment[MDF$JF1>=0.9 & MDF$Xpert2Outcome_num %in% "1" & MDF$TB.Medication.History %in% "No"] <- "Bac negative high JF score New (0.5%)"
-MDF$Comment[MDF$JF1>=0.9 & MDF$Xpert2Outcome_num %in% "1" & MDF$TB.Medication.History %in% "Yes"] <- "Bac negative high JF score with TB History (1%)"
+MDF$Comment2 <- ""
+MDF$Comment2[MDF$JF1>=0.9 & MDF$Xpert2Outcome_num %in% "1" & MDF$TB.Medication.History %in% "No"] <- "Bac negative high JF score New (0.5%)"
+MDF$Comment2[MDF$JF1>=0.9 & MDF$Xpert2Outcome_num %in% "1" & MDF$TB.Medication.History %in% "Yes"] <- "Bac negative high JF score with TB History (1%)"
 
-MDF$Comment[MDF$Radiology.Result == "X-Ray Normal" & MDF$Xpert2Outcome_num %in% "0"] <- "Bac Neg human normal" 
+MDF$Comment2[MDF$Radiology.Result == "X-Ray Normal" & MDF$Xpert2Outcome_num %in% "0"] <- "Bac Neg human normal" 
+# sample_n(MDF[MDF$Comment2 %in% "Bac negative high JF score New (0.5%)", ], 14)
+# sample_n(MDF[MDF$Comment2 %in% "Bac negative high JF score with TB History (1%)", ], 6)
+# sample_n(MDF[MDF$Comment2 %in% "Bac Neg human normal", ], 19)
+Teleradiology<- rbind(sample_n(MDF[MDF$Comment2 %in% "Bac negative high JF score New (0.5%)", ], 14), sample_n(MDF[MDF$Comment2 %in% "Bac negative high JF score with TB History (1%)", ], 6),sample_n(MDF[MDF$Comment2 %in% "Bac Neg human normal", ], 19), MDF[!MDF$Comment %in% "", ])
 
 
 
-# write.csv(MDF, "US Human read.csv")
+write.csv(Teleradiology, "Teleradiology.csv", row.names = FALSE)
 
 # MDF <- read.csv("US Human read.csv")
 

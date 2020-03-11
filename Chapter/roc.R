@@ -1,9 +1,11 @@
 source("radiologist.R")
+CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
+
+CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
+
 
 Radiologist <- Radiologist[Radiologist$Referral %in% "MDF", ]
 
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE 4 digits.csv")
-CAD_Xpert_plot <- CAD_Xpert_plot[, -1]
 
 CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
 
@@ -23,29 +25,26 @@ base <- ggplot(CAD_Xpert_plot, aes(X, Sens)) + geom_path(aes(color = DeepLearnin
   geom_ribbon(aes(x = X, ymin = Sens_L, ymax = Sens_H, color = DeepLearningSystem, fill = DeepLearningSystem), alpha= 0.2) 
 
 
-ggROC <- base + theme_minimal() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal()+ annotate("text", x = .75, y = .15, 
-                                                                                                                                                label = paste(" CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", "\n",
-                                                                                                                                                              "IF2: ", round(roc_IF2[2],2), " (95% CI:", round(roc_IF2[1],2), "-", round(roc_IF2[3],2), ")", "\n",
+ggROC <- base + theme_minimal() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal()+ annotate("text", x = .75, y = .15, label = paste(" CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", "\n", "InferReadDR: ", round(roc_IF2[2],2), " (95% CI:", round(roc_IF2[1],2), "-", round(roc_IF2[3],2), ")", "\n",
                                                                                                                                                               # "IF3: ", round(roc_IF3[2],2), " (95% CI:", round(roc_IF3[1],2), "-", round(roc_IF3[3],2), ")", "\n",
-                                                                                                                                                              "JF1: ", round(roc_JF1[2],2), " (95% CI:", round(roc_JF1[1],2), "-", round(roc_JF1[3],2), ")", "\n",
+                                                                                                                                                              "JF CXR-1: ", round(roc_JF1[2],2), " (95% CI:", round(roc_JF1[1],2), "-", round(roc_JF1[3],2), ")", "\n",
                                                                                                                                                               # "JF2: ", round(roc_JF2[2],2), " (95% CI:", round(roc_JF2[1],2), "-", round(roc_JF2[3],2), ")", "\n",
                                                                                                                                                               # "IF1: ", round(roc_IF1[2],2), " (95% CI:", round(roc_IF1[1],2), "-", round(roc_IF1[3],2), ")", "\n",
-                                                                                                                                                
-                                                                                                                                                              "Lunit: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n",
+                                                                                                                                                                                                                                                                                                          "Lunit INSIGHT CXR: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n",
                                                                                                                                                               "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n", sep = ""), size = 3) +
-  labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("Figure X: The ROC curves of  CAD4TB(v6), Infervision(v2), JF CXR-1, Lunit(4.9.0) and qXR(v2) using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) 
+labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("Figure X: The ROC curves of  CAD4TB(v6), Infervision(v2), JF CXR-1, Lunit(4.9.0) and qXR(v2) using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) 
 
-ggROC <- ggROC + geom_point(data = Radiologist, mapping = aes(X, Sens, shape = AccuracyTableCategory)) 
-# + geom_ribbon(Radiologist, aes(x=X, ymin = Sens_L, ymax = Sens_H), fill = "red", alpha = 0.2)
+ggROC <- ggROC + geom_point(data = Radiologist, mapping = aes(X, Sens, shape = AccuracyTableCategory)) + geom_hline(yintercept = c(0.9, 0.95), linetype="dotted", color = "blue", size=1) 
+
 
 tiff("Results/Figure-2 ROCs.tif", width = 10, height = 7.9, units = "in", res = 100)
 ggROC
 dev.off()
 
 ggROC1 <- ggROC + coord_cartesian(xlim = c(0.25, 0.5), ylim = c(0.90, 1) ) +
-  ggtitle("Figure 2b: Zoomed-in view of the square marked part of Fig. 2a")+theme_light()
+  ggtitle("ROC")+theme_light()
 
-tiff("Results/Figure-2 Zoomed-in.tif", width = 8, height = 3.2, units = "in", res = 100)
+tiff("ROC Zoomed-in", width = 8, height = 3.2, units = "in", res = 100)
 ggROC1
 dev.off()
 

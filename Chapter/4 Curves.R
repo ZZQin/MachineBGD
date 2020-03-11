@@ -1,14 +1,10 @@
 source("DataWrangling/GlobalOption.R")
 
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE 4 digits.csv")
-CAD_Xpert_plot <- CAD_Xpert_plot[, -1]
-CAD_Xpert_plot$NNT <- 1/CAD_Xpert_plot$ppv
-CAD_Xpert_plot$NNT_H <- 1/CAD_Xpert_plot$PPV_L
-CAD_Xpert_plot$NNT_L <- 1/CAD_Xpert_plot$PPV_H
+CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
+# CAD_Xpert_plot <- CAD_Xpert_plot[, -1]
 
 
-CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
-CAD_Xpert_plot$Score[CAD_Xpert_plot$DeepLearningSystem %in% "CAD4TB"] <- CAD_Xpert_plot$Score[CAD_Xpert_plot$DeepLearningSystem %in% "CAD4TB"]/100
+CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
 
 ### Sensitivity vs Score --------------------
 base <- ggplot(CAD_Xpert_plot, aes(Score, Sens)) + geom_path(aes(color = DeepLearningSystem)) + 
@@ -55,19 +51,19 @@ CAD_Xpert_plot$X_H <- 1-CAD_Xpert_plot$Spec_L
 base <- ggplot(CAD_Xpert_plot, aes(X, Sens)) + geom_path(aes(color = DeepLearningSystem)) + geom_ribbon(aes(x = X, ymin = Sens_L, ymax = Sens_H, color = DeepLearningSystem, fill = DeepLearningSystem), alpha= 0.2) 
 # + geom_ribbon(aes(y = Sens, xmin = X_L, xmax = X_H, color = DeepLearningSystem, fill = DeepLearningSystem), alpha= 0.2) 
 
-ROC <- base + theme_light() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal() +   labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("The ROC curves (n=", length(MDF$PID_OMRS), ")"))  +theme(legend.position = c(0.95,0.05), legend.justification = c("right", "bottom")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))
+ROC <- base + theme_light() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal() +   labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("The ROC curves (n=", length(MDF$PID_OMRS), ")"))  +theme(legend.position = c(0.95,0.05), legend.justification = c("right", "bottom")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1)) + theme(legend.position = "none")
 
 
 ### PRC
 base <- ggplot(CAD_Xpert_plot, aes(Sens, ppv)) + geom_path(aes(color = DeepLearningSystem)) + 
-  geom_ribbon(data = CAD_Xpert_plot %>% filter(Sens <0.90), aes(x = Sens, ymin = PPV_L, ymax = PPV_H, color = DeepLearningSystem, fill = DeepLearningSystem), alpha= 0.2) 
+  geom_ribbon(data = CAD_Xpert_plot %>% filter(Sens >0.1), aes(x = Sens, ymin = PPV_L, ymax = PPV_H, color = DeepLearningSystem, fill = DeepLearningSystem), alpha= 0.2) 
 
-PRC <- base + theme_light() + coord_equal() + labs(x = "Recall (Sensitivity)", y= "Precision (PPV)", subtitle = paste0("The PRC of CAD4TB(v6), Infervision(v2), JF CXR-1, Lunit(4.9.0) and qXR(v2) using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) +theme(legend.position = "none") 
+PRC <- base + theme_light() + coord_equal() + labs(x = "Recall (Sensitivity)", y= "Precision (PPV)", subtitle = paste0("The Precision Recall Curve (n=", length(MDF$PID_OMRS), ")")) +theme(legend.position = c(0.95,-0.7), legend.justification = c("right", "bottom")) 
 
 
 ### Save --------------------
 
-tiff("Results/6 Curves.tif", width = 10, height = 15, units = "in", res = 100)
+tiff("Results/5 Curves.tif", width = 10, height = 15, units = "in", res = 100)
 require(gridExtra)
 grid.arrange(sensCurve, ROC, XpertSavingCurve, PRC, NNTCurve, nrow=3)
 

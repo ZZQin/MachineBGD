@@ -17,7 +17,7 @@ library(DataExplorer)
 library("readxl")
 as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
 
-Master_df <- read.table(file = "DataWrangling/Master_60K_OpenMRS_08_11_2018.csv", header=T, sep=",")
+Master_df <- read.csv(file = "DataWrangling/Master_60K_OpenMRS_08_11_2018.csv", header=T)
 Master_df$Result.Date <- mdy(Master_df$Radiology.Result.Date)
 Master_df$Result.Year <- quarter(Master_df$Result.Date)
 
@@ -172,19 +172,34 @@ MDF$AgeGroup [MDF$Age<25]<- "[15,25)"
 MDF$AgeGroup [MDF$Age>=25 & MDF$Age<60]<- "[25,60)"
 MDF$AgeGroup [MDF$Age>=60]<- "[60,108]"
 
-# MDF <- MDF %>%
-  # filter(Result.Date < as.Date("2016-12-01"))
 
 MDF <- MDF[, -c(3,4)]
 
 Master_df <- read.csv("AI Scores/Master_df.csv")
 MDF$Referral <- Master_df$type[match(MDF$PID_OMRS, Master_df$PID)]
 
-# Referral <- read.csv("DataWrangling/referral_source.csv")
 
-write.csv(MDF, "DataWrangling/MDF.csv")
+#### Referral Source -----------------------
+library(readxl)
+Referral <- read_excel("DataWrangling/referral_source.xlsx")
+Referral <- Referral[, -1]
+colnames(Referral)[3] <- "ReferralSource"
+Referral$ReferralSource <- tolower(Referral$ReferralSource)
+
+unique(Referral$ReferralSource)
+
+Classification_ZZ <- read_excel("DataWrangling/Classification_ZZ.xlsx")
+Classification_ZZ$ReferralUnit <- tolower(Classification_ZZ$ReferralUnit)
+Referral$UseCase <- Classification_ZZ$Unit[match(Referral$ReferralSource, Classification_ZZ$ReferralUnit)]
+table(Referral$UseCase )
+View(Referral[, c(1:3, 44)])
+
+MDF <- Referral[, -c(3)]
+
+#### Save  -----------------------
+write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
 # rm(DOTS, Master_df_V5, Master_df_valid, Private_provider, Self, V5_only, CAD.cost, Radiologist.cost, Xpert.cost)
-
+rm(Classification_ZZ, Referral)
 
 
 
