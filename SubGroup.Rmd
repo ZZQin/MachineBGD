@@ -57,8 +57,8 @@ CAD_Xpert_plot_Old <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Old.csv")
 
 
 SubgroupTable <- rbind(CAD_Xpert_plot_New, CAD_Xpert_plot_Old, CAD_Xpert_plot_Young, CAD_Xpert_plot_Middle, CAD_Xpert_plot_Senior, CAD_Xpert_plot_Referral, CAD_Xpert_plot_DOTS, CAD_Xpert_plot_WalkIn)
-write.csv(SubgroupTable, "Chapter/Subgroup Table/SubgroupTable.csv", row.names = F)
-rm(list=(ls()))
+# write.csv(SubgroupTable, "Chapter/Subgroup Table/SubgroupTable.csv", row.names = F)
+# rm(list=(ls()))
 ```
 
 ```{r AUC}
@@ -97,37 +97,37 @@ all$subgroup <- "all"
 ## New only
 l <- ROCPRC(New, New_long)
 New <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-New$subgroup <- "New"
+New$subgroup <- "New cases"
 
 ## Old only
 l <- ROCPRC(Old, Old_long)
 Old <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Old$subgroup <- "Old"
+Old$subgroup <- "Previously treated cases"
 
 ## Young
 l <- ROCPRC(Young, Young_long)
 Young <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Young$subgroup <- "Young"
+Young$subgroup <- "Young age"
 
 ## Middle
 l <- ROCPRC(Middle, Middle_long)
 Middle <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Middle$subgroup <- "Middle"
+Middle$subgroup <- "Middle age"
 
 ## Senior
 l <- ROCPRC(Senior, Senior_long)
 Senior <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Senior$subgroup <- "Senior"
+Senior$subgroup <- "Old age"
 
 ## Referral only
 l <- ROCPRC(Referral, Referral_long)
 Referral <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Referral$subgroup <- "Referral"
+Referral$subgroup <- "Referred"
 
 ## DOTS only
 l <- ROCPRC(DOTS, DOTS_long)
 DOTS <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-DOTS$subgroup <- "DOTS"
+DOTS$subgroup <- "DOTS retested"
 
 ## Walk-in only
 l <- ROCPRC(WalkIn, WalkIn_long)
@@ -142,7 +142,7 @@ WalkIn$subgroup <- "WalkIn"
 aucTable <- rbind(all, New, Old, Young, Middle, Senior, Referral, DOTS, WalkIn)
 colnames(aucTable) <- c("DL System", "AUC", "PCAUC", "Subgroup")
 write.csv(aucTable, "Results/aucTable.csv")
-rm(list=(ls()))
+# rm(list=(ls()))
 
 ```
 
@@ -183,18 +183,18 @@ aucTable <- read.csv("Results/aucTable.csv")
 aucTable <- aucTable[, -1]
 
 ### AUC
-age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young", "Middle", "Senior"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
-referral<-ggplot(aucTable[aucTable$Subgroup %in% c("Referral", "DOTS", "WalkIn"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+referral<-ggplot(aucTable[aucTable$Subgroup %in% c("Referred", "DOTS retested", "WalkIn"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
-history<-ggplot(aucTable[aucTable$Subgroup %in% c("New", "Old"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+history<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
 ### PRC
-agePC<-ggplot(aucTable[aucTable$Subgroup %in% c("Young", "Middle", "Senior"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+agePC<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("Referral", "DOTS", "WalkIn"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("Referred", "DOTS retested", "WalkIn"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-historyPC<-ggplot(aucTable[aucTable$Subgroup %in% c("New", "Old"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+historyPC<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=DL.System, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
 
 tiff("Results/AUC plot.tif", width = 18, height = 8, units = "in", res = 100)
