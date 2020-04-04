@@ -1,13 +1,21 @@
 source("DataWrangling/GlobalOption.R")
 
+MDF$qXRv2 <- MDF$qXRv2*100
+MDF$LunitScore <- MDF$LunitScore*100
+
+MDF$IF2 <- MDF$IF2*100
+
+MDF$JF1 <- MDF$JF1*100
+
+
 # MDF <- subset(MDF, MDF$Age > 15)
 library(tableone)
 
 # Define numeric variables
-listVar <- c("Age", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn", "CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2")
+listVar <- c("Age", "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn", "CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2")
 
 #Define categorical variables
-catVars <- c( "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn")
+catVars <- c( "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn")
 
 
 table1 <- CreateTableOne(vars = listVar, strata=c("Xpert2Outcome_num"), data = MDF, factorVars = catVars)

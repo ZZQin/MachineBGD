@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="20c2e3b0-65ad-436b-83a7-8a250e88a1e7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/MachineBGD.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.RData" beforeDir="false" afterPath="$PROJECT_DIR$/.RData" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rhistory" beforeDir="false" afterPath="$PROJECT_DIR$/.Rhistory" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/pcs/debug-breakpoints.pper" beforeDir="false" afterPath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/pcs/debug-breakpoints.pper" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/pcs/windowlayoutstate.pper" beforeDir="false" afterPath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/pcs/windowlayoutstate.pper" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/rmd-outputs" beforeDir="false" afterPath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/rmd-outputs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/sources/prop/INDEX" beforeDir="false" afterPath="$PROJECT_DIR$/.Rproj.user/CCAC9AF3/sources/prop/INDEX" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.Rproj.user/shared/notebooks/paths" beforeDir="false" afterPath="$PROJECT_DIR$/.Rproj.user/shared/notebooks/paths" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Chapter/roc.R" beforeDir="false" afterPath="$PROJECT_DIR$/Chapter/roc.R" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Chapter/table1.R" beforeDir="false" afterPath="$PROJECT_DIR$/Chapter/table1.R" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Draft.Rmd" beforeDir="false" afterPath="$PROJECT_DIR$/Draft.Rmd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Draft.docx" beforeDir="false" afterPath="$PROJECT_DIR$/Draft.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Draft2.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ROC Zoomed-in" beforeDir="false" afterPath="$PROJECT_DIR$/ROC Zoomed-in" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/AUC plot.tif" beforeDir="false" afterPath="$PROJECT_DIR$/Results/AUC plot.tif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/Figure-2 ROCs.tif" beforeDir="false" afterPath="$PROJECT_DIR$/Results/Figure-2 ROCs.tif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/Figure-3 PR Curves.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/JF.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/PPVCurve.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/Results.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Results/Results.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/Table 1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Results/Table 1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SubGroup.Rmd" beforeDir="false" afterPath="$PROJECT_DIR$/SubGroup.Rmd" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 1/simple_value_estimator complete.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-7">
+              <caret line="19" selection-start-line="19" selection-end-line="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AUC_CI_DeLong.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="326">
+              <caret line="221" column="18" selection-start-line="221" selection-start-column="18" selection-end-line="221" selection-end-column="18" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2/vectors pt1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="368">
+              <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/AUC_CI_DeLong.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-2568" />
+    <option name="y" value="-738" />
+    <option name="width" value="2576" />
+    <option name="height" value="1416" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Course" />
+      <pane id="ProjectPane" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.vectors pt2 Single instruction multiple data SIDM">
+    <configuration name="vectors pt1" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="MachineBGD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2/vectors pt1.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="vectors pt2 Single instruction multiple data SIDM" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="MachineBGD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2/vectors pt2 Single instruction multiple data SIDM.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.vectors pt2 Single instruction multiple data SIDM" />
+        <item itemvalue="Python.vectors pt1" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24950495" />
+      <window_info id="Structure" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Educational.CheckDetails" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32957748" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 1/simple_value_estimator complete.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-7">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AUC_CI_DeLong.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="221" column="18" selection-start-line="221" selection-start-column="18" selection-end-line="221" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2/vectors pt2 Single instruction multiple data SIDM.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" column="11" lean-forward="true" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Dropbox/Personal/Python/Machine_Learning_EssT_ValueEstimate/Chapter 2/vectors pt1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="368">
+          <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

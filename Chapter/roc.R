@@ -43,16 +43,16 @@ ggROC <- ggROC + geom_point(data = Radiologist, mapping = aes(X, Sens, shape = A
 # dev.off()
 
 
-AUC <- paste("Lunit INSIGHT CXR: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", ", ", 
+AUC <- paste("Lunit INSIGHT CXR: ", round(roc_Lunit[2],4), " (95% CI:", round(roc_Lunit[1],4), "-", round(roc_Lunit[3],4), ")", ", ", 
              
-             "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", ", ",
+             "qXR: ", round(roc_qure[2],4), " (95% CI:", round(roc_qure[1],4), "-", round(roc_qure[3],4), ")", ", ",
              
-             "InferReadDR: ", round(roc_IF2[2],2), " (95% CI:", round(roc_IF2[1],2), "-", round(roc_IF2[3],2), ")", ", ", 
+             "InferReadDR: ", round(roc_IF2[2],4), " (95% CI:", round(roc_IF2[1],4), "-", round(roc_IF2[3],4), ")", ", ", 
              
-             "JF CXR-1: ", round(roc_JF1[2],2), " (95% CI:", round(roc_JF1[1],2), "-", round(roc_JF1[3],2), ")", ", ",  
+             "JF CXR-1: ", round(roc_JF1[2],4), " (95% CI:", round(roc_JF1[1],4), "-", round(roc_JF1[3],4), ")", ", ",  
              
-             "CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")",sep = "")
+             "CAD4TB: ", round(roc_CAD6[2],4), " (95% CI:", round(roc_CAD6[1],4), "-", round(roc_CAD6[3],4), ")",sep = "")
 
 
 
-rm(roc_CAD6, roc_JF1, roc_JF2, roc_qure, roc_Lunit, roc_IF1, roc_IF2, roc_IF3, dat)
+# rm(roc_CAD6, roc_JF1, roc_JF2, roc_qure, roc_Lunit, roc_IF1, roc_IF2, roc_IF3, dat)
