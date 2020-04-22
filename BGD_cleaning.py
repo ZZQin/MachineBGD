@@ -5,13 +5,14 @@ import matplotlib.pylab as plt
 from pandas import Series, DataFrame
 
 ## Importing MDF.csv ---------------------------------------------------------------------------------------
-address = 'C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/CAR-Bangladesh/CAR_BGD/MDF.csv'
+address = 'C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/MachineBGD/DataWrangling/MDF.csv'
 
 # Making a list of missing value types
-missing_values = ["n/a", "na", "--", "N/A", "-"]
+missing_values = ["n/a", "na", "--", "N/A", "-", ""]
 BGD = pd.read_csv(address, na_values= missing_values)
-BGD = BGD.drop(['Given', 'FamilyName', 'Patient.BD', 'Filename', 'Radiology.Result.Date'], axis=1)
+BGD = BGD.drop(['Radiology.Result.Date'], axis=1)
 print(BGD.info())
+del(address)
 
 ## checking missing symptom values ---------------------------------------------------------------------------------------
 print (BGD['Cough'].isnull())

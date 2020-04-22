@@ -56,3 +56,11 @@ MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "No" & MDF_long$Xpert2
 MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "Yes" & MDF_long$Xpert2Outcome_num %in% "1"] <- "Bac Pos - with TB History"
 
 
+ML <- MDF[, c('PID_OMRS', 'Gender', 'Age', 'Cough', 'Fever', 'Active.Breathing.Shortness', 'Weight.Loss', 'Haemoptysis', 'TB.Medication.History', 'qXRv2', 'CAD4TB6', 'JF1', 'IF2','Xpert2Outcome_num')]
+
+ML_training <- ML[sample(nrow(ML), 18853), ]
+ML_testing <- subset(ML, !(ML$PID_OMRS %in% ML_training$PID_OMRS))
+
+write.csv(ML, "DataWrangling/ML.csv", row.names = F)
+write.csv(ML_training, "DataWrangling/ML_training.csv", row.names = F)
+write.csv(ML_testing, "DataWrangling/ML_testing.csv", row.names = F)

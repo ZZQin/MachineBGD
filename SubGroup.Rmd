@@ -32,47 +32,7 @@ Senior_long <- MDF_long[MDF_long$AgeGroup %in% "[60,108]",]
 Referral_long  <- subset(MDF_long, MDF_long$UseCase %in% "PrivatePublicReferral")
 DOTS_long  <- subset(MDF_long, MDF_long$UseCase %in% "PublicDOTSRetesting")
 WalkIn_long  <- subset(MDF_long, MDF_long$UseCase %in% "WalkIn")
-# 
-# 
-# New_Yong <- MDF[MDF$TB.Medication.History %in% "No" & MDF$AgeGroup %in% "[15,25)",]
-# Old_Yong <- MDF[MDF$TB.Medication.History %in% "Yes"& MDF$AgeGroup %in% "[15,25)",]
-# 
-# New_Middle <- MDF[MDF$TB.Medication.History %in% "No" & MDF$AgeGroup %in% "[25,60)",]
-# Old_Middle <- MDF[MDF$TB.Medication.History %in% "Yes"& MDF$AgeGroup %in% "[25,60)",]
-# 
-# New_Senior <- MDF[MDF$TB.Medication.History %in% "No" & MDF$AgeGroup %in% "[60,108]",]
-# Old_Senior <- MDF[MDF$TB.Medication.History %in% "Yes"& MDF$AgeGroup %in% "[60,108]",]
 
-# Missing_long  <- subset(MDF, is.na(MDF$UseCase)==T)
-
-# source("Chapter/Subgroup Table/Young.R")
-# source("Chapter/Subgroup Table/Middle.R")
-# source("Chapter/Subgroup Table/Senior.R")
-# source("Chapter/Subgroup Table/Referral.R")
-# source("Chapter/Subgroup Table/DOTS.R")
-# write.csv(CAD_Xpert_plot_Middle, "Chapter/Subgroup Table/CAD_Xpert_plot_Middle.csv")
-# write.csv(CAD_Xpert_plot_Young, "Chapter/Subgroup Table/CAD_Xpert_plot_Young.csv")
-# write.csv(CAD_Xpert_plot_Senior, "Chapter/Subgroup Table/CAD_Xpert_plot_Senior.csv")
-# write.csv(CAD_Xpert_plot_Referral, "Chapter/Subgroup Table/CAD_Xpert_plot_Referral.csv")
-# write.csv(CAD_Xpert_plot_DOTS, "Chapter/Subgroup Table/CAD_Xpert_plot_DOTS.csv")
-# write.csv(CAD_Xpert_plot_WalkIn, "Chapter/Subgroup Table/CAD_Xpert_plot_WalkIn.csv")
-# write.csv(CAD_Xpert_plot_New, "Chapter/Subgroup Table/CAD_Xpert_plot_New.csv")
-# write.csv(CAD_Xpert_plot_Old, "Chapter/Subgroup Table/CAD_Xpert_plot_Old.csv")
-
-
-# CAD_Xpert_plot_Middle <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Middle.csv")
-# CAD_Xpert_plot_Young <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Young.csv")
-# CAD_Xpert_plot_Senior <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Senior.csv")
-# CAD_Xpert_plot_DOTS <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_DOTS.csv")
-# CAD_Xpert_plot_WalkIn <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_WalkIn.csv")
-# CAD_Xpert_plot_Referral <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Referral.csv")
-# CAD_Xpert_plot_New <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_New.csv")
-# CAD_Xpert_plot_Old <- read.csv("Chapter/Subgroup Table/CAD_Xpert_plot_Old.csv")
-# 
-# 
-# SubgroupTable <- rbind(CAD_Xpert_plot_New, CAD_Xpert_plot_Old, CAD_Xpert_plot_Young, CAD_Xpert_plot_Middle, CAD_Xpert_plot_Senior, CAD_Xpert_plot_Referral, CAD_Xpert_plot_DOTS, CAD_Xpert_plot_WalkIn)
-# write.csv(SubgroupTable, "Chapter/Subgroup Table/SubgroupTable.csv", row.names = F)
-# rm(list=(ls()))
 ```
 
 ```{r 2 AUC}
@@ -159,51 +119,10 @@ Male <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 Male$subgroup <- "Male"
 #### stratification by age AND prior TB history
 
-# l <- ROCPRC(New_Yong)
-# New_Yong <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# New_Yong$subgroup <- "New_Yong"
-# 
-# 
-# l <- ROCPRC(New_Middle)
-# New_Middle <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# New_Middle$subgroup <- "New_Middle"
-# 
-# 
-# l <- ROCPRC(New_Senior)
-# New_Senior <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# New_Senior$subgroup <- "New_Senior"
-# 
-# 
-# 
-# l <- ROCPRC(Old_Yong)
-# Old_Yong <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# Old_Yong$subgroup <- "Old_Yong"
-# 
-# 
-# l <- ROCPRC(Old_Middle)
-# Old_Middle <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# Old_Middle$subgroup <- "Old_Middle"
-# 
-# 
-# 
-# l <- ROCPRC(Old_Senior)
-# Old_Senior <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-# Old_Senior$subgroup <- "Old_Senior"
-# 
-# 
-# temp <- rbind(New_Yong, New_Middle, New_Senior, Old_Yong, Old_Middle, Old_Senior)
-# colnames(temp) <- c("DL.System", "AUC", "PCAUC", "Subgroup")
-# temp$AUC <- as.numeric.factor(temp$AUC)
-# temp$PCAUC <- as.numeric.factor(temp$PCAUC)
-
-# View(temp)
-
-# ggplot(temp, aes(x=DL.System, y=AUC, fill=Subgroup))+  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
-
 
 aucTable <- rbind(all, New, Old, Young, Middle, Senior, Referral, DOTS, WalkIn, Female, Male)
 colnames(aucTable) <- c("DL System", "AUC", "PCAUC", "Subgroup")
-write.csv(aucTable, "Results/aucTable.csv")
+# write.csv(aucTable, "Results/aucTable.csv")
 # rm(list=(ls()))
 ```
 
@@ -301,6 +220,7 @@ SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "q
 aucTable <- read.csv("Results/aucTable.csv")
 aucTable <- aucTable[, -1]
 
+aucTable$Subgroup <- factor(aucTable$Subgroup, levels = c("Young age", "Middle age", "Old age", "Referred", "DOTS retested", "WalkIn", "New cases", "Previously treated cases", "Female", "Male"))
 ### AUC
 age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=DL.System, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
