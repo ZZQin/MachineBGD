@@ -12,11 +12,11 @@ hist
 dev.off()
 
 ## Density plot
-p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..density.., fill = XpertHistory)) + xlab("Abnormality Scores of the Deep Learning Systems") 
-density <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#f7f7f7", "#fbb4b9", "#91003f", "#a1dab4", "#006d2c"))+ scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0 , 100, 10)) 
+p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..density.., fill = XpertHistory)) + xlab("Abnormality Scores of the AI products") 
+density <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "bottom") +scale_fill_manual(values=c("#f7f7f7", "#fbb4b9", "#91003f", "#a1dab4", "#006d2c"))+ scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0 , 100, 10)) 
 density
 
-tiff("Results/density.tif", width = 14, height = 8, units = "in", res = 100)
+tiff("Results/density.tif", width = 7, height = 6, units = "in", res = 100)
 density
 dev.off()
 
@@ -42,13 +42,16 @@ dev.off()
 # hist_Old
 # dev.off()
 
-# print("Xpert Positive vs Negative")
-# paste(colnames(MDF)[27], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 27]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 27]),4))
-# paste(colnames(MDF)[28], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 28]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 28]),4))
-# paste(colnames(MDF)[29], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 29]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 29]),4))
-# paste(colnames(MDF)[30], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 30]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 30]),4))
-# paste(colnames(MDF)[31], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 31]),4))
-# paste(colnames(MDF)[32], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 32]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 32]),4))
-# paste(colnames(MDF)[33], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 33]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),4))
+library(moments)
+library(scales)
+
+print("Xpert Positive vs Negative")
+paste(colnames(MDF)[27], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 27]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 27]),4))
+paste(colnames(MDF)[28], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 28]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 28]),4))
+paste(colnames(MDF)[29], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 29]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 29]),4))
+paste(colnames(MDF)[30], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 30]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 30]),4))
+paste(colnames(MDF)[31], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 31]),4))
+paste(colnames(MDF)[32], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 32]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 32]),4))
+paste(colnames(MDF)[33], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 33]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),4))
 
 # Mode(MDF[MDF$Xpert2Outcome_num ==1, 28])

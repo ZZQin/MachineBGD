@@ -10,7 +10,8 @@ Radiologist <- Radiologist[Radiologist$Referral %in% "MDF", ]
 CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
 
 roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, MDF)
-roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv2_100, MDF)
+roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, MDF)
+
 roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore_100, MDF)
 roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, MDF)
 roc_JF2 <- ci.auc(Xpert2Outcome_num ~ JF2_100, MDF)
@@ -18,6 +19,11 @@ roc_IF1 <- ci.auc(Xpert2Outcome_num ~ IF1_100, MDF)
 roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, MDF)
 roc_IF3 <- ci.auc(Xpert2Outcome_num ~ IF3_100, MDF)
 
+# library(pROC)
+# roc1 <- roc(Xpert2Outcome_num ~ CAD4TB6, MDF)
+# roc2 <- roc(Xpert2Outcome_num ~ qXRv3_100, MDF)
+# cov(roc1, roc2, method="obuchowski")
+# cov(roc1, roc2, method="delong")
 
 # base <- ggplot(CAD_Xpert_plot, aes(X, Sens, color = DeepLearningSystem)) + geom_path()+ geom_ribbon(aes(x = X, ymin = Sens_L, ymax = Sens_H), fill = "red", alpha= 0.2)
 

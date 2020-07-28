@@ -72,3 +72,4 @@ Radiologist$Sensitivity <- paste0(percent(Radiologist$Sens), ", (", percent(Radi
 Radiologist$Specificity <- paste0(percent(Radiologist$Spec), ", (", percent(Radiologist$Spec_L, suffix = ""), "-", percent(Radiologist$Spec_H), ")")
 
 
+

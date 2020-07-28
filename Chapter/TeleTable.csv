@@ -1,0 +1,13 @@
+"","TB_Abnormality","TB_Abnormality.1","All_Abnormality","All_Abnormality.1","Normal","Normal.1","Total"
+"Missed by 1 AI AND by human",5,"41.7%",0,"0.0%",7,"58.3%",12
+"Missed by 2 AI AND human ",8,"61.5%",0,"0.0%",5,"38.5%",13
+"Missed by 3 AI AND human ",4,"25.0%",0,"0.0%",12,"75.0%",16
+"Missed by 4 AI AND human ",6,"28.6%",3,"14.3%",12,"57.1%",21
+"Missed by 5 AI AND human ",11,"23.9%",3,"6.5%",32,"69.6%",46
+"Missed by 1 AI but NOT human",151,"91.0%",12,"7.2%",3,"1.8%",166
+"Missed by 2 AI but NOT human ",44,"72.1%",12,"19.7%",5,"8.2%",61
+"Missed by 3 AI but NOT human ",15,"71.4%",5,"23.8%",1,"4.8%",21
+"Missed by 4 AI but NOT human ",12,"50.0%",5,"20.8%",7,"29.2%",24
+"Missed by 5 AI but NOT human",2,"33.3%",1,"16.7%",3,"50.0%",6
+"Missed by human ONLY ",60,"83.3%",6,"8.3%",6,"8.3%",72
+"Total",318,NA,47,NA,93,NA,458

@@ -28,13 +28,13 @@ Adult_Valid <- read_csv('Adult_Valid.csv')
 ### Histogram 
 ```{r Histogram, fig.width=8, fig.height=5,}
 # make it long
-Adult_Valid$qXRv2_100 <- Adult_Valid$qXRv2*100
+Adult_Valid$qXRv3_100 <- Adult_Valid$qXRv3*100
 
-Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100)
+Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100)
 
 
 # p <- ggplot(Adult_Valid,aes(CAD4TB6))
-# p <- ggplot(Adult_Valid,aes(qXRv2))
+# p <- ggplot(Adult_Valid,aes(qXRv3))
 # p <- ggplot(Adult_Valid,aes(DrCADxScore))
 
 Adult_Valid_long$Xpert2Outcome_num <- as.factor(Adult_Valid_long$Xpert2Outcome_num)
@@ -55,12 +55,12 @@ p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = 
 # p + geom_histogram(position = 'identity', alpha=0.5, aes(y = ..density.., fill = Xpert2Outcome_num), bins = 20) + stat_density(position = 'identity',aes(colour = Xpert2Outcome_num)) # Pooled
 
 # library(moments)
-# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 28]) #28 CAD4TB6, 29 qXRv2, 33 Lunit
-# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 29]) #29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 28]) #28 CAD4TB6, 29 qXRv3, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 29]) #29 qXRv3, 33 Lunit
 # skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==1, 33]) #33 Lunit
 # 
-# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 28]) #28 CAD4TB6, 29 qXRv2, 33 Lunit
-# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 29]) #29 qXRv2, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 28]) #28 CAD4TB6, 29 qXRv3, 33 Lunit
+# skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 29]) #29 qXRv3, 33 Lunit
 # skewness(Adult_Valid[Adult_Valid$Xpert2Outcome_num ==0, 33]) #33 Lunit
 
 ```
@@ -68,19 +68,19 @@ p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = 
 ###  Multi-ROC (Xpert Reference) 
 ```{r Multi-ROC_All_Xpert}
 # make it long
-Adult_Valid$qXRv2_100 <- Adult_Valid$qXRv2*100
+Adult_Valid$qXRv3_100 <- Adult_Valid$qXRv3*100
 
-Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100)
+Adult_Valid_long <- gather(Adult_Valid, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100)
 
 
 ############# Pooled ###############
 roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, Adult_Valid)
-roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv2_100, Adult_Valid)
+roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, Adult_Valid)
 # roc_Lunit <- ci.auc(Xpert2Outcome_num ~ Lunit, Adult_Valid)
 # Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "Lunit_100"] <- "Lunit"
 
 Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "CAD4TB6"] <- "CAD4TB"
-Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "qXRv2_100"] <- "qXR"
+Adult_Valid_long$DeepLearningSystem[Adult_Valid_long$DeepLearningSystem %in% "qXRv3_100"] <- "qXR"
 
 
 Adult_Valid_long$DeepLearningSystem <- as.factor(Adult_Valid_long$DeepLearningSystem)
@@ -170,10 +170,10 @@ mylist <- as.list(mylist)
 
 for (i in 1:100){
 myfunction <- function(CountryX, car.cutoff){
-a <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
-b <- sum(CountryX$qXRv2 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
-c <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
-d <- sum(CountryX$qXRv2 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
+a <- sum(CountryX$qXRv3 >= car.cutoff & CountryX$Xpert2Outcome_num =="1")
+b <- sum(CountryX$qXRv3 >= car.cutoff & CountryX$Xpert2Outcome_num =="0")
+c <- sum(CountryX$qXRv3 < car.cutoff & CountryX$Xpert2Outcome_num =="1")
+d <- sum(CountryX$qXRv3 < car.cutoff & CountryX$Xpert2Outcome_num =="0")
 dat <- as.table(matrix(c(a,b,c,d), nrow = 2, byrow = TRUE))
 colnames(dat) <- c("Dis+","Dis-")
 rownames(dat) <- c("Test+","Test-")
@@ -184,7 +184,7 @@ pv.positive <- as.vector(round((rval$elements$pv.positive),2))
 pv.negative <- as.vector(round((rval$elements$pv.negative),2))
 correct.rate <- round((a+d)/length(CountryX$Xpert2Outcome_num), 2)
 
-perc_above_CAR_Score<- sum(CountryX$qXRv2 >= car.cutoff)/length(CountryX$TID_OMRS)
+perc_above_CAR_Score<- sum(CountryX$qXRv3 >= car.cutoff)/length(CountryX$TID_OMRS)
 Score <- qure_ai_score[i]
 
 accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, perc_above_CAR_Score, Score, correct.rate)

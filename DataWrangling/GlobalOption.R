@@ -23,7 +23,9 @@ Mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-MDF <- read.csv("DataWrangling/MDF.csv")
+# MDF <- read.csv("DataWrangling/MDF.csv")
+MDF <- read.csv("DataWrangling/MDF.6.3.csv")
+
 MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]
 sum(is.na(MDF$GXP.Result)==T)
 MDF <- MDF[is.na(MDF$Radiology.Result)==F, ]
@@ -31,15 +33,15 @@ MDF <- MDF[MDF$Age >=15, ]
 
 
 # Make it long
-# MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100, IF1_100, IF2_100)
-# MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100, LunitScore_100, JF1_100, JF2_100, IF1_100, IF2_100, IF3_100)
-MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv2_100, LunitScore_100, JF1_100, IF2_100)
+# MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100, IF1_100, IF2_100)
+# MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100, LunitScore_100, JF1_100, JF2_100, IF1_100, IF2_100, IF3_100)
+MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100, LunitScore_100, JF1_100, IF2_100)
 
 MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
 MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "IF2_100"] <- "InferReadDR"
 MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "LunitScore_100"] <- "Lunit INSIGHT CXR"
 MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "CAD4TB6"] <- "CAD4TB"
-MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "qXRv2_100"] <- "qXR"
+MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "qXRv3_100"] <- "qXR"
 MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "JF1_100"] <- "JF CXR-1"
 
 MDF_long$DeepLearningSystem[MDF_long$DeepLearningSystem %in% "JF2_100"] <- "JF2"
@@ -56,11 +58,11 @@ MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "No" & MDF_long$Xpert2
 MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "Yes" & MDF_long$Xpert2Outcome_num %in% "1"] <- "Bac Pos - with TB History"
 
 
-ML <- MDF[, c('PID_OMRS', 'Gender', 'Age', 'Cough', 'Fever', 'Active.Breathing.Shortness', 'Weight.Loss', 'Haemoptysis', 'TB.Medication.History', 'qXRv2', 'CAD4TB6', 'JF1', 'IF2','Xpert2Outcome_num')]
+ML <- MDF[, c('PID_OMRS', 'Gender', 'Age', 'Cough', 'Fever', 'Active.Breathing.Shortness', 'Weight.Loss', 'Haemoptysis', 'TB.Medication.History', 'qXRv3', 'CAD4TB6', 'JF1', 'IF2','Xpert2Outcome_num')]
 
-ML_training <- ML[sample(nrow(ML), 18853), ]
-ML_testing <- subset(ML, !(ML$PID_OMRS %in% ML_training$PID_OMRS))
+# ML_training <- ML[sample(nrow(ML), 18853), ]
+# ML_testing <- subset(ML, !(ML$PID_OMRS %in% ML_training$PID_OMRS))
 
-write.csv(ML, "DataWrangling/ML.csv", row.names = F)
-write.csv(ML_training, "DataWrangling/ML_training.csv", row.names = F)
-write.csv(ML_testing, "DataWrangling/ML_testing.csv", row.names = F)
+# write.csv(ML, "DataWrangling/ML.csv", row.names = F)
+# write.csv(ML_training, "DataWrangling/ML_training.csv", row.names = F)
+# write.csv(ML_testing, "DataWrangling/ML_testing.csv", row.names = F)

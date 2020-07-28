@@ -1,6 +1,6 @@
 source("DataWrangling/GlobalOption.R")
 
-MDF$qXRv2 <- MDF$qXRv2*100
+MDF$qXRv3 <- MDF$qXRv3*100
 MDF$LunitScore <- MDF$LunitScore*100
 
 MDF$IF2 <- MDF$IF2*100
@@ -12,7 +12,7 @@ MDF$JF1 <- MDF$JF1*100
 library(tableone)
 
 # Define numeric variables
-listVar <- c("Age", "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn", "CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2")
+listVar <- c("Age", "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2")
 
 #Define categorical variables
 catVars <- c( "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "rad.highly.TB", "rad.TB", "rad.abn")
@@ -24,9 +24,9 @@ tableType <- CreateTableOne(vars = listVar, strata=c("UseCase"), data = MDF, fac
 table1.all <- CreateTableOne(vars = listVar, data = MDF, factorVars = catVars)
 
 
-table1 <- print(table1, nonnormal = c("Age", "CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
-tabletype <- print(tableType, nonnormal = c("Age", "CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
-table1all <- print(table1.all, nonnormal = c("Age","CAD4TB6", "qXRv2", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+table1 <- print(table1, nonnormal = c("Age", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+tabletype <- print(tableType, nonnormal = c("Age", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+table1all <- print(table1.all, nonnormal = c("Age","CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
 
 table1DF <- data.frame(columnNameILike = row.names(table1), table1)
 table1allDF <- data.frame(columnNameILike = row.names(table1all), table1all)

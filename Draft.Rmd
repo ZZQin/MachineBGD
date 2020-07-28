@@ -81,10 +81,11 @@ The grading of "any abnormality" has high sensitivity, `r paste0(percent(Radiolo
 source("Chapter/roc.R")
 
 Supp_Tab <- read_csv("Results/Supp Tab.csv")
+Supp_Tab_4digits <- read_csv("Results/Supp Tab 4digits.csv")
 Supp_Tab$Score[Supp_Tab$DeepLearningSystem %in% "CAD4TB"] <- Supp_Tab$Score[Supp_Tab$DeepLearningSystem %in% "CAD4TB"]/100
 Supp_Tab <- subset(Supp_Tab, Supp_Tab$Site %in% "BGD")
 # View(Supp_Tab)
-Supp_Tab <- Supp_Tab[Supp_Tab$Score %in% c(0.6, 0.7, 0.8), c(2:4, 8, 9)]
+# Supp_Tab <- Supp_Tab[Supp_Tab$Score %in% c(0.6, 0.7, 0.8), c(2:4, 8, 9)]
 knitr::kable(Supp_Tab)
 ```
 

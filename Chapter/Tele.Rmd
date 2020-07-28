@@ -1,0 +1,172 @@
+
+```{r}
+library(readxl)
+Teleradiology <- read_excel("C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/MachineBGD/DataWrangling/TeleradiologyReportsUpdated.xlsx")
+# names(Teleradiology)
+colnames(Teleradiology)[1] <- "TID_OMRS"
+
+Teleradiology$`Abnormality/TB`[Teleradiology$`Abnormality/TB` == "Abnormality consistent with TB" ] <- "TB_Abnormality"
+Teleradiology$`Abnormality/TB`[Teleradiology$`Abnormality/TB` == "Abnormality NOT consistent with TB" ] <- "All_Abnormality"
+
+Teleradiology[!Teleradiology$TID_OMRS %in% Tele$TID_OMRS, 1]
+
+Tele <- merge(Teleradiology, MDF[, c(1, 3, 13, 46:52)], by="TID_OMRS")
+
+# write.csv(Tele, "Tele.csv")
+t1 <- table(Tele$Comment, Tele$`Abnormality/TB`)
+# ftable(addmargins(t1))
+# t1[4, ]  <- t1[4, ] +t1[6, ]
+# t1[2, ]  <- t1[2, ] +t1[4, ]
+# 
+# t1[7, ]  <- t1[7, ] +t1[8, ]
+# t1[5, ]  <- t1[5, ] +t1[7, ]
+# t1[3, ]  <- t1[3, ] +t1[5, ]
+
+t1 <- t1[c(2,4,6,8,10, 3,5,7,9,11, 12), ]
+addmargins(t1)
+# teleTable <- as.data.frame()
+teleTable <- matrix(addmargins(t1), nrow = 12, ncol=4, byrow = FALSE)
+
+row.names(teleTable) <- c("Missed by 1 AI AND by human" ,  "Missed by 2 AI AND human ", "Missed by 3 AI AND human ", "Missed by 4 AI AND human ",  "Missed by 5 AI AND human ", "Missed by 1 AI but NOT human",  "Missed by 2 AI but NOT human ", "Missed by 3 AI but NOT human ", "Missed by 4 AI but NOT human ", "Missed by 5 AI but NOT human", "Missed by human ONLY ", "Total")
+colnames(teleTable) <- c("All_Abnormality", "Normal", "TB_Abnormality", "Total")
+
+teleTable <- as.data.frame(teleTable)
+
+MarginTable <- percent(matrix(prop.table(t1, margin = 1), nrow = 11, ncol=3, byrow = FALSE))
+MarginTable <- matrix(MarginTable, nrow = 11, ncol=3, byrow = FALSE)
+row.names(MarginTable) <- c("Missed by 1 AI AND by human" ,  "Missed by 2 AI AND human ", "Missed by 3 AI AND human ", "Missed by 4 AI AND human ",  "Missed by 5 AI AND human ", "Missed by 1 AI but NOT human",  "Missed by 2 AI but NOT human ", "Missed by 3 AI but NOT human ", "Missed by 4 AI but NOT human ", "Missed by 5 AI but NOT human", "Missed by human ONLY ")
+
+colnames(MarginTable) <- c("All_Abnormality", "Normal", "TB_Abnormality")
+MarginTable <- as.data.frame(MarginTable)
+
+MarginTable[nrow(MarginTable)+1, ] = c("", "", "")
+row.names(MarginTable)[12] <- "Total"
+
+TeleTable <- cbind(teleTable, MarginTable)
+rm(teleTable, MarginTable)
+
+TeleTable <- TeleTable[, c(3,7,1,5,2,6,4)]
+TeleTable
+# write.csv(TeleTable, "TeleTable.csv")
+```
+
+
+## Rradiologist Accuracy
+```{r Rradiologist Accuracy}
+MDF$USHuman <- Tele$`Abnormality/TB`[match(MDF$TID_OMRS, Tele$TID_OMRS)]
+USOnly <- MDF[is.na(MDF$USHuman)==FALSE, ]
+
+## BGD radiologists
+  ###  High+possible ----------------------------
+  TP <- sum(USOnly$rad.TB %in% "1" & USOnly$Xpert2Outcome_num==1)
+  FP <- sum(USOnly$rad.TB %in% 1 & USOnly$Xpert2Outcome_num==0)
+  TN <- sum(USOnly$rad.TB %in% 0 & USOnly$Xpert2Outcome_num==0)
+  FN <- sum(USOnly$rad.TB %in% 0 & USOnly$Xpert2Outcome_num==1)
+  
+  
+  dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+  colnames(dat) <- c("Xpert+","Xpert-")
+  rownames(dat) <- c("CXR+","CXR-")
+  rval <- epi.tests(dat, conf.level = 0.95)
+  Probably <- rval$elements[c(59, 55)]
+  rm(TP, FP, TN, FN)
+  
+  ### Any Abnormalities ------------------------------
+  TP <- sum(USOnly$rad.abn %in% "1" & USOnly$Xpert2Outcome_num==1)
+  FP <- sum(USOnly$rad.abn %in% 1 & USOnly$Xpert2Outcome_num==0)
+  TN <- sum(USOnly$rad.abn %in% 0 & USOnly$Xpert2Outcome_num==0)
+  FN <- sum(USOnly$rad.abn %in% 0 & USOnly$Xpert2Outcome_num==1)
+  
+  
+  dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+  colnames(dat) <- c("Xpert+","Xpert-")
+  rownames(dat) <- c("CXR+","CXR-")
+  rval <- epi.tests(dat, conf.level = 0.95)
+  Any <- rval$elements[c(59, 55)]
+  rm(TP, FP, TN, FN)
+  
+  BGDReader <- data.frame(matrix(unlist(c(Probably, Any)), nrow = 2, byrow = T))
+  colnames(BGDReader) <- c("Sens", "Sens_L", "Sens_H", "Spec", "Spec_L", "Spec_H")
+  BGDReader$X <- 1-BGDReader$Spec
+  BGDReader$BGDReaderCategory <- c("Probably TB", "Any Abnormality")
+  
+
+## US radiologists
+###  TB Abnormality ----------------------------
+  TP <- sum(USOnly$USHuman %in% "TB_Abnormality" & USOnly$Xpert2Outcome_num==1)
+  FP <- sum(USOnly$USHuman %in% "TB_Abnormality" & USOnly$Xpert2Outcome_num==0)
+  TN <- sum(USOnly$USHuman != "TB_Abnormality" & USOnly$Xpert2Outcome_num==0)
+  FN <- sum(USOnly$USHuman != "TB_Abnormality" & USOnly$Xpert2Outcome_num==1)
+  
+  dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+  colnames(dat) <- c("Xpert+","Xpert-")
+  rownames(dat) <- c("CXR+","CXR-")
+  rval <- epi.tests(dat, conf.level = 0.95)
+  TB <- rval$elements[c(59, 55)]
+  rm(TP, FP, TN, FN)
+
+
+###  All Abnormality ----------------------------
+  TP <- sum(USOnly$USHuman != "Normal" & USOnly$Xpert2Outcome_num==1)
+  FP <- sum(USOnly$USHuman != "Normal" & USOnly$Xpert2Outcome_num==0)
+  TN <- sum(USOnly$USHuman == "Normal" & USOnly$Xpert2Outcome_num==0)
+  FN <- sum(USOnly$USHuman == "Normal" & USOnly$Xpert2Outcome_num==1)
+  
+  dat <- as.table(matrix(c(TP, FP, FN, TN), nrow=2, byrow=TRUE))
+  colnames(dat) <- c("Xpert+","Xpert-")
+  rownames(dat) <- c("CXR+","CXR-")
+  rval <- epi.tests(dat, conf.level = 0.95)
+  All <- rval$elements[c(59, 55)]
+  
+  USReader <- data.frame(matrix(unlist(c(TB, All)), nrow = 2, byrow = T))
+  colnames(USReader) <- c("Sens", "Sens_L", "Sens_H", "Spec", "Spec_L", "Spec_H")
+  USReader$X <- 1-USReader$Spec
+  rm(TP, FP, TN, FN)
+  
+  
+USReader
+BGDReader
+```
+
+## ROC
+```{r ROC}
+library(ggplot2)
+library(scales)
+library(epiR)
+library(ggthemes)
+library(RColorBrewer)
+library(plyr)
+library(reshape2)
+library(pROC)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(plotROC)
+library(flextable)
+library(DataExplorer)
+
+roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, USOnly)
+roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, USOnly)
+roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore_100, USOnly)
+roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, USOnly)
+roc_JF2 <- ci.auc(Xpert2Outcome_num ~ JF2_100, USOnly)
+roc_IF1 <- ci.auc(Xpert2Outcome_num ~ IF1_100, USOnly)
+roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, USOnly)
+roc_IF3 <- ci.auc(Xpert2Outcome_num ~ IF3_100, USOnly)
+
+USOnly_long <- gather(USOnly, DeepLearningSystem, AbnormalityScore, CAD4TB6, qXRv3_100, LunitScore_100, JF1_100, IF2_100)
+
+ggROC <- ggplot(USOnly_long, aes(d = Xpert2Outcome_num, m = AbnormalityScore, color = DeepLearningSystem)) + geom_roc(cutoffs.at = c(50,80)) + style_roc(xlab = "1 - Specificity", ylab = "Sensitivity")
+
+ggROC <- ggROC + annotate("text", x = .75, y = .15, label = paste("Lunit INSIGHT CXR: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n", "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n", "InferReadDR: ", round(roc_IF2[2],2), " (95% CI:", round(roc_IF2[1],2), "-", round(roc_IF2[3],2), ")", "\n", "JF CXR-1: ", round(roc_JF1[2],2), " (95% CI:", round(roc_JF1[1],2), "-", round(roc_JF1[3],2), ")", "\n",  "CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", sep = ""), size = 3)
+# 
+# ggROC <- ggROC + geom_hline(yintercept = 0.8096192, linetype="dotted", color = "blue", size=0.5) + geom_vline(xintercept = 0.2105263, linetype="dotted", color = "blue", size=0.5)
+# ggROC <- ggROC + geom_hline(yintercept = 0.7134269, linetype="dotted", color = "red", size=0.5) + geom_vline(xintercept = 0.1578947, linetype="dotted", color = "red", size=0.5)
+
+ggROC <- ggROC + geom_hline(yintercept =  0.5030060, linetype="dotted", color = "blue", size=0.5) + geom_vline(xintercept = 0.1578947, linetype="dotted", color = "blue", size=0.5)
+ggROC <- ggROC + geom_hline(yintercept = 0.8096192, linetype="dotted", color = "red", size=0.5) + geom_vline(xintercept = 0.2105263, linetype="dotted", color = "red", size=0.5)
+
+ggROC
+```
+

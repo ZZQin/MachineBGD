@@ -1,13 +1,7 @@
 source("radiologist.R")
 
 ########### Human vs AI ####################
-SubgroupPlot <- read.csv("Chapter/Subgroup Table/SubgroupTable.csv")
-SubgroupPlot <- SubgroupPlot[, -1]
-
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert_Precise.csv")
-
-CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
-CAD_Xpert_plot <- CAD_Xpert_plot[CAD_Xpert_plot$Site %in% "BGD", ]
+CAD_Xpert_plot <- read.csv("Results/CAD_Xpert_lunit.csv")
 
 # knitr::kable(Radiologist[(Radiologist$Referral %in% "MDF"), c(8, 10, 11)])
 Human <- Radiologist[(Radiologist$Referral %in% "MDF"), c(8, 10, 11, 4)]
