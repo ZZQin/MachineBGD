@@ -1,3 +1,7 @@
+####========================================================
+# CAD4TB version 6 and verson 6.3 are both included in this script. no need to rerun the cleaning.r, just load different dataset
+# line 30-31
+####========================================================
 Sys.setenv(LANG = "en")
 knitr::opts_chunk$set(fig.width=8, fig.height=6, 
                       echo=FALSE, warning=FALSE, message=FALSE)
@@ -17,14 +21,15 @@ library(plotROC)
 library(flextable)
 library(DataExplorer)
 library("readxl")
+
 as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
 Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-MDF <- read.csv("DataWrangling/MDF.csv")
-# MDF <- read.csv("DataWrangling/MDF.6.3.csv")
+# MDF <- read.csv("DataWrangling/MDF.csv")
+MDF <- read.csv("DataWrangling/MDF.6.3.csv")
 
 MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]
 sum(is.na(MDF$GXP.Result)==T)

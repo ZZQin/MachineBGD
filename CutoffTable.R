@@ -1,15 +1,15 @@
-Nepal_Cameroon <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Clean/Nepal_Cameroon.csv", header = T)
-Nepal_Cameroon <- Nepal_Cameroon[, -1]
-NPL <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "NPL", ]
-CAM <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "CAM", ]
+# Nepal_Cameroon <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Clean/Nepal_Cameroon.csv", header = T)
+# Nepal_Cameroon <- Nepal_Cameroon[, -1]
+# NPL <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "NPL", ]
+# CAM <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "CAM", ]
 
-maxV <- 10001
-sep <- 0.0001
-sepdeflt <- 0.01
+# maxV <- 10001
+# sep <- 0.0001
+# sepdeflt <- 0.01
 
-# maxV<- 101
-# sep <- 0.01
-# sepdeflt <- 1
+maxV<- 101
+sep <- 0.01
+sepdeflt <- 1
 
 ### Set up a function
 myfunction <- function(CountryX, DL.System, car.cutoff){
@@ -245,14 +245,13 @@ myfunction <- function(CountryX, DL.System, car.cutoff){
 # rm(CAM.qXR3, CAM.Lunit, CAM.Infervision, CAM.JF1, CAM.CAD4TB6)
 
 ################ Bangladesh #####################################
-source(file = "DataWrangling/GlobalOption.R")
 source("radiologist.R")
 BGD <- MDF[, ]
-names(BGD)[26] <- "CAD4TB6"
-names(BGD)[27] <- "qXR3"
-names(BGD)[28] <- "Lunit"
-names(BGD)[29]<- "JF1"
-names(BGD)[32] <- "Infervision"
+names(BGD)[23] <- "CAD4TB6"
+names(BGD)[24] <- "qXR3"
+names(BGD)[25] <- "Lunit"
+names(BGD)[26]<- "JF1"
+names(BGD)[29] <- "Infervision"
 names(BGD)[13] <- "XPERT_pos"
 
 
