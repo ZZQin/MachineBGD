@@ -23,8 +23,8 @@ Mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-# MDF <- read.csv("DataWrangling/MDF.csv")
-MDF <- read.csv("DataWrangling/MDF.6.3.csv")
+MDF <- read.csv("DataWrangling/MDF.csv")
+# MDF <- read.csv("DataWrangling/MDF.6.3.csv")
 
 MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]
 sum(is.na(MDF$GXP.Result)==T)
@@ -58,7 +58,7 @@ MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "No" & MDF_long$Xpert2
 MDF_long$XpertHistory[MDF_long$TB.Medication.History %in% "Yes" & MDF_long$Xpert2Outcome_num %in% "1"] <- "Bac Pos - with TB History"
 
 
-ML <- MDF[, c('PID_OMRS', 'Gender', 'Age', 'Cough', 'Fever', 'Active.Breathing.Shortness', 'Weight.Loss', 'Haemoptysis', 'TB.Medication.History', 'qXRv3', 'CAD4TB6', 'JF1', 'IF2','Xpert2Outcome_num')]
+# ML <- MDF[, c('PID_OMRS', 'Gender', 'Age', 'Cough', 'Fever', 'Active.Breathing.Shortness', 'Weight.Loss', 'Haemoptysis', 'TB.Medication.History', 'qXRv3', 'CAD4TB6', 'JF1', 'IF2','Xpert2Outcome_num')]
 
 # ML_training <- ML[sample(nrow(ML), 18853), ]
 # ML_testing <- subset(ML, !(ML$PID_OMRS %in% ML_training$PID_OMRS))

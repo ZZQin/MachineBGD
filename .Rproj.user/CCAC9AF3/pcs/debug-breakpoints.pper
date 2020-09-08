@@ -1,21 +1,6 @@
 {
     "debugBreakpointsState" : {
         "breakpoints" : [
-            {
-                "editor_line_number" : 46,
-                "editor_state" : 1,
-                "function_name" : "toplevel",
-                "function_steps" : "",
-                "id" : 0,
-                "is_package_breakpoint" : false,
-                "is_pending_debug_completion" : false,
-                "line_number" : 46,
-                "needs_updated_steps" : false,
-                "package_name" : "",
-                "path" : "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/02 Bangladesh/MachineBGD/Chapter/roc.R",
-                "state" : 1,
-                "type" : 1
-            }
         ]
     }
 }

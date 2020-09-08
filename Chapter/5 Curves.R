@@ -1,14 +1,4 @@
-source("01_Data_Prep/clean.R")
-Radiologist <- read.csv("09_Results/Radiologist.csv")
-CAD_Xpert_plot_lunit <- read.csv("09_Results/CutoffTable/CAD_Xpert Cutoffs TABLE_lunit.csv")
-CAD_Xpert_plot_qXR2 <- read.csv("09_Results/CutoffTable/CAD_Xpert Cutoffs TABLE_qXR2.csv")
-CAD_Xpert_plot_qXR3 <- read.csv("09_Results/CutoffTable/CAD_Xpert Cutoffs TABLE_qXR3.csv")
-CAD_Xpert_plot_CAD4TB <- read.csv("09_Results/CutoffTable/CAD_Xpert Cutoffs TABLE_CAD4TB.csv")
 
-CAD_Xpert_plot <- rbind(CAD_Xpert_plot_qXR2, CAD_Xpert_plot_lunit, CAD_Xpert_plot_qXR3, CAD_Xpert_plot_CAD4TB)
-rm(CAD_Xpert_plot_qXR2, CAD_Xpert_plot_lunit, CAD_Xpert_plot_qXR3, CAD_Xpert_plot_CAD4TB)
-
-CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "ALL")
 
 ### d. Sensitivity vs Score --------------------
 base <- ggplot(CAD_Xpert_plot, aes(Score, Sens)) + geom_path(aes(color = AI)) + scale_fill_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +  scale_color_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) 

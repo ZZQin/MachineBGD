@@ -33,15 +33,15 @@ SymptomData <- read_excel("DataWrangling/ScreeningData.xlsx")
 
 Master_df <- merge(Master_df, SymptomData, by.x = "PID_OMRS", by.y = "OpenMRS Identification Number", all.x = TRUE)
 
-# # Delft 6.0.0
-# CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", header = T, fill = T) 
-# colnames(CAD6_delft)[7] <- "TID_Delft"
-# CAD6_delft <- CAD6_delft[, -2]
-# CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
+# Delft 6.0.0
+CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", header = T, fill = T)
+colnames(CAD6_delft)[7] <- "TID_Delft"
+CAD6_delft <- CAD6_delft[, -2]
+CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
 
-# Delft 6.3.0
-CAD6_delft <- read.table(file = "DataWrangling/Delft 6.3.0.csv", sep = ",", header = T, fill = T) 
-names(CAD6_delft)[1] <- "TID_Delft"
+# # Delft 6.3.0
+# CAD6_delft <- read.table(file = "DataWrangling/Delft 6.3.0.csv", sep = ",", header = T, fill = T) 
+# names(CAD6_delft)[1] <- "TID_Delft"
 
 
 QA.BGD <- read.csv(file = "./AI Scores/qXRv3.csv", header=T, sep=",")
@@ -199,8 +199,8 @@ table(MDF$UseCase)
 
 
 #### Save  -----------------------
-# write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
-write.csv(MDF, "DataWrangling/MDF.6.3.csv", row.names = F)
+write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
+# write.csv(MDF, "DataWrangling/MDF.6.3.csv", row.names = F)
 rm(Classification_ZZ, Referral, Master_df)
 
 
