@@ -1,25 +1,24 @@
 source("radiologist.R")
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
+# CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
+CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv")
+
+
 CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
 
 # MDF <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Nepal_Cameroon.csv")
 
-
 Radiologist <- Radiologist[Radiologist$Referral %in% "MDF", ]
-
 
 # CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
 
-CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3", "InferReadDR", "JF CXR-1"), ]
+CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3", "InferReadDR", "JF CXR-1", "Lunit INSIGHT CXR", "qXR"), ]
 roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, MDF)
 roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, MDF)
 
 roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore_100, MDF)
 roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, MDF)
-roc_JF2 <- ci.auc(Xpert2Outcome_num ~ JF2_100, MDF)
-roc_IF1 <- ci.auc(Xpert2Outcome_num ~ IF1_100, MDF)
+
 roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, MDF)
-roc_IF3 <- ci.auc(Xpert2Outcome_num ~ IF3_100, MDF)
 
 # library(pROC)
 # roc1 <- roc(Xpert2Outcome_num ~ CAD4TB6, MDF)
@@ -38,8 +37,13 @@ base <- ggplot(CAD_Xpert_plot, aes(X, Sens)) + geom_path(aes(color = DeepLearnin
 
 
 ### GDG for the top 3 only ****
-ggROC <- base + theme_light() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal()+ annotate("text", x = .75, y = .15, label = paste("Lunit INSIGHT CXR: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n", "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n",  "CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", sep = ""), size = 3) +
-  labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("Figure X: The ROC curves of  CAD4TB, Lunit and qXR using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) 
+# ggROC <- base + theme_light() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal()+ annotate("text", x = .75, y = .15, label = paste("Lunit INSIGHT CXR: ", round(roc_Lunit[2],2), " (95% CI:", round(roc_Lunit[1],2), "-", round(roc_Lunit[3],2), ")", "\n", "qXR: ", round(roc_qure[2],2), " (95% CI:", round(roc_qure[1],2), "-", round(roc_qure[3],2), ")", "\n",  "CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", sep = ""), size = 3) +
+  # labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("Figure X: The ROC curves of  CAD4TB, Lunit and qXR using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) 
+
+
+### cad4tb 6.3 only ****
+ggROC <- base + theme_light() + geom_abline(slope=1, intercept = 0, linetype = "dashed", alpha=0.7, color = "grey") + coord_equal()+ annotate("text", x = .75, y = .15, label = paste("CAD4TB: ", round(roc_CAD6[2],2), " (95% CI:", round(roc_CAD6[1],2), "-", round(roc_CAD6[3],2), ")", sep = ""), size = 3) +
+  labs(x = "1-Specificity", y= "Sensitivity", subtitle = paste0("The ROC curves of  CAD4TB v6.3 using Xpert results as the reference (n=", length(MDF$PID_OMRS), ")")) 
 
 ### GDG for the top 3 only ###
 ggROC <- ggROC + geom_point(data = Radiologist, mapping = aes(X, Sens, shape = AccuracyTableCategory))  

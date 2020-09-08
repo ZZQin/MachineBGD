@@ -3,13 +3,13 @@
 # NPL <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "NPL", ]
 # CAM <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "CAM", ]
 
-# maxV <- 10001
-# sep <- 0.0001
-# sepdeflt <- 0.01
+maxV <- 10001
+sep <- 0.0001
+sepdeflt <- 0.01
 
-maxV<- 101
-sep <- 0.01
-sepdeflt <- 1
+# maxV<- 101
+# sep <- 0.01
+# sepdeflt <- 1
 
 ### Set up a function
 myfunction <- function(CountryX, DL.System, car.cutoff){
@@ -376,7 +376,7 @@ colnames(CAD_Xpert)[9] <- "PPV_H"
 colnames(CAD_Xpert)[10] <- "npv"
 colnames(CAD_Xpert)[11] <- "NPV_L"
 colnames(CAD_Xpert)[12] <- "NPV_H"
-colnames(CAD_Xpert)[13] <- "%XpertSaved"
+colnames(CAD_Xpert)[13] <- "XpertSaved%"
 colnames(CAD_Xpert)[14] <- "Score"
 colnames(CAD_Xpert)[15] <- "accuracy"
 colnames(CAD_Xpert)[16] <- "Site"
@@ -423,14 +423,20 @@ tapply(CAD_Xpert$Score, CAD_Xpert$DeepLearningSystem, summary)
 
 
 ################################
-# SuppTable <- CAD_Xpert[, c(16, 17, 14, 27:31, 13, 15)]
-# View(SuppTable)
-CAD_Xpert_plot <- CAD_Xpert[, c(16, 17, 14, 13, 15, 1:12, 19, 28:30)]
+SuppTable <- CAD_Xpert %>%
+  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`)
+View(SuppTable)
+
+CAD_Xpert_plot <- CAD_Xpert %>%
+  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
 
 
-write.csv(CAD_Xpert, "Results/CAD_Xpert_Precise.csv", row.names = F)
-write.csv(CAD_Xpert, "Results/CAD_Xpert_qXR3.csv", row.names = F)
-write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
+# write.csv(CAD_Xpert, "Results/CAD_Xpert_Precise.csv", row.names = F)
+# write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
+
+write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
+write.csv(CAD_Xpert, "Results/CAD_Xpert_CAD6.3.csv", row.names = F)
+
 # write.csv(SuppTable, "Results/Supp Tab.csv", row.names = F)
 # 
 # rm(CAM.DF, NPL.DF, BGD.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, BGD.DF, BGD)
