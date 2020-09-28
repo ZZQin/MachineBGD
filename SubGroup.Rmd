@@ -127,45 +127,6 @@ rm(list=(ls()))
 ```
 
 
-```{r PRAUC CI}
-data(P10N10)
-
-s1 <- c(1, 2, 3, 4)
-s2 <- c(5, 6, 7, 8)
-s3 <- matrix(1:8, 4, 2)
-
-# Join two score vectors
-scores1 <- join_scores(s1, s2)
-
-# Join two vectors and a matrix
-scores2 <- join_scores(s1, s2, s3)
-
-l1 <- c(1, 0, 1, 1)
-l2 <- c(1, 0, 1, 1)
-l3 <- c(1, 0, 1, 0)
-
-# Join two label vectors
-labels1 <- join_labels(l1, l2)
-labels2 <- join_labels(l1, l3)
-
-# A dataset with 20 samples for the good early retrieval performance level
-samps3 <- create_sim_samples(20, 10, 10, "good_er")
-
-# Calculate ROC and Precision-Recall curves
-sscurves <- evalmod(scores = P10N10$scores, labels = P10N10$labels)
-
-# Specify test dataset IDs names
-smmdat1 <- mmdata(scores1, labels2, dsids = c(1,2))
-
-# Use a sample dataset created by the create_sim_samples function
-smmdat2 <- mmdata(samps3[["scores"]], samps3[["labels"]], dsids = samps3[["dsids"]])
-
-# Calculate curves for multiple test datasets and keep all the curves
-smcurves <- evalmod(smmdat2, raw_curves = TRUE)
-
-autoplot(smcurves, "PRC", show_cb = TRUE)
-```
-
 
 ```{r ROC AUC with CI}
 
@@ -221,41 +182,8 @@ WalkIn$subgroup <- "WalkIn"
 ROCaucTable <- rbind(New, Old, Young, Middle, Senior, Referral, DOTS, WalkIn)
 View(ROCaucTable)
 write.csv(ROCaucTable, "Results/ROCaucTable.csv", row.names = F)
-
-
 ```
 
-
-## Subgroup Curves
-```{r subgroup curves, eval=F}
-# subgroup 4 curves
-
-SubgroupPlot <- read.csv("Chapter/Subgroup Table/SubgroupTable.csv")
-SubgroupPlot <- SubgroupPlot[, -1]
-SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"] <- SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"]/100
-SubgroupPlot$subgroup <- as.character(SubgroupPlot$subgroup)
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "New"] <- "1.New Case"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Old"] <- "2.Previously Treated Case"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Young"] <- "3.Young age [15,25)"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Middle"] <- "4.Middle age [25,60)"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Senior"] <- "5.Old age [60,108]"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "DOTS"] <- "7.Public DOTS Retesting"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Referral"] <-"6.Private Public Referral"
-SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "WalkIn"] <-"8.Walk In"
-SubgroupPlot$subgroup <- as.factor(SubgroupPlot$subgroup)
-
-SubgroupPlotOrigin <- SubgroupPlot
-# SubgroupPlot <- SubgroupPlotOrigin
-# Choose the DL System
-# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "CAD4TB", ]
-# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "IF2", ]
-# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "JF1", ]
-# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "Lunit", ]
-SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "qXR", ]
-
-### GO TO AND RUN source("Chapter/Subgroup Table/SubGroupPlot.R")
-
-```
 
 ```{r Bar chart}
 aucTable <- read.csv("Results/aucTable.csv")

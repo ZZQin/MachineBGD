@@ -3,13 +3,14 @@
 # NPL <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "NPL", ]
 # CAM <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "CAM", ]
 
-maxV <- 10001
-sep <- 0.0001
-sepdeflt <- 0.01
+source("DataWrangling/GlobalOption.R")
+# maxV <- 10001
+# sep <- 0.0001
+# sepdeflt <- 0.01
 
-# maxV<- 101
-# sep <- 0.01
-# sepdeflt <- 1
+maxV<- 101
+sep <- 0.01
+sepdeflt <- 1
 
 ### Set up a function
 myfunction <- function(CountryX, DL.System, car.cutoff){
@@ -397,7 +398,7 @@ CAD_Xpert$Specificity <- paste(percent(CAD_Xpert$Spec, accuracy = 0.1), " (", CA
 CAD_Xpert$PPV <- paste(percent(CAD_Xpert$ppv, accuracy = 0.1), " (", CAD_Xpert$PPV_95CI, ")", sep = "")
 CAD_Xpert$NPV <- paste(percent(CAD_Xpert$npv, accuracy = 0.1), " (", CAD_Xpert$NPV_95CI, ")", sep = "")
 CAD_Xpert$nnt <- paste(round(CAD_Xpert$NNT, 1), " (", round(CAD_Xpert$NNT_L, 1), "-", round(CAD_Xpert$NNT_H, 1), ")", sep = "")
-CAD_Xpert$`%XpertSaved` <- round(CAD_Xpert$`%XpertSaved`, 8)
+CAD_Xpert$`%XpertSaved%` <- round(CAD_Xpert$`%XpertSaved%`, 8)
 CAD_Xpert$accuracy <- round(CAD_Xpert$accuracy, 3)
 
 CAD_Xpert$DeepLearningSystem <- as.character(CAD_Xpert$DeepLearningSystem)
@@ -427,17 +428,21 @@ SuppTable <- CAD_Xpert %>%
   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`)
 View(SuppTable)
 
-CAD_Xpert_plot <- CAD_Xpert %>%
-  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
+write.csv(SuppTable, "Results/Supp Tab_CAD6.3.csv", row.names = F)
 
+# CAD_Xpert_plot <- CAD_Xpert %>%
+#   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved.`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
+# 
+# 
+# # write.csv(CAD_Xpert, "Results/CAD_Xpert_Precise.csv", row.names = F)
+# # write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
+# 
+# write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
+# write.csv(CAD_Xpert, "Results/CAD_Xpert_CAD6.3.csv", row.names = F)
+# 
+# # CAD_Xpert <- read.csv("Results/CAD_Xpert_CAD6.3.csv")
+# # CAD_Xpert <- read.csv("Results/CAD_Xpert_CAD.csv")
 
-# write.csv(CAD_Xpert, "Results/CAD_Xpert_Precise.csv", row.names = F)
-# write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
-
-write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
-write.csv(CAD_Xpert, "Results/CAD_Xpert_CAD6.3.csv", row.names = F)
-
-# write.csv(SuppTable, "Results/Supp Tab.csv", row.names = F)
 # 
 # rm(CAM.DF, NPL.DF, BGD.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, BGD.DF, BGD)
 # 

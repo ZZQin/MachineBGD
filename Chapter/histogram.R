@@ -1,6 +1,16 @@
 source("DataWrangling/GlobalOption.R")
 
 
+table(MDF_long$DeepLearningSystem)
+MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
+
+# MDF_long$DeepLearningSystem[grep("CAD4TB", MDF_long$DeepLearningSystem)] <- "P1"
+# MDF_long$DeepLearningSystem[grep("qXR", MDF_long$DeepLearningSystem)] <- "P3"
+# MDF_long$DeepLearningSystem[grep("Lunit INSIGHT CXR", MDF_long$DeepLearningSystem)] <- "P2"
+
+MDF_long <- MDF_long[!MDF_long$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
+
+
 
 ## Histogram
 p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..count.., fill = XpertHistory)) + xlab("Abnormality Scores of the Deep Learning Systems") 
@@ -16,7 +26,7 @@ p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogra
 density <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "bottom") +scale_fill_manual(values=c("#f7f7f7", "#fbb4b9", "#91003f", "#a1dab4", "#006d2c"))+ scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0 , 100, 10)) 
 density
 
-tiff("Results/density.tif", width = 7, height = 6, units = "in", res = 100)
+tiff("Results/density.tif", width = 10, height = 6, units = "in", res = 100)
 density
 dev.off()
 
@@ -52,6 +62,6 @@ paste(colnames(MDF)[29], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 29])
 paste(colnames(MDF)[30], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 30]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 30]),4))
 paste(colnames(MDF)[31], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 31]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 31]),4))
 paste(colnames(MDF)[32], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 32]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 32]),4))
-paste(colnames(MDF)[33], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 33]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 33]),4))
+paste(colnames(MDF)[23], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 23]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 23]),4))
 
 # Mode(MDF[MDF$Xpert2Outcome_num ==1, 28])

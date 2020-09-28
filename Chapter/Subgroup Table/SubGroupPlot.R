@@ -1,3 +1,33 @@
+##################################### Inital ##################
+# subgroup 4 curves
+SubgroupPlot <- read.csv("Chapter/Subgroup Table/SubgroupTable.csv")
+SubgroupPlot <- SubgroupPlot[, -1]
+SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"] <- SubgroupPlot$Score[SubgroupPlot$DeepLearningSystem %in% "CAD4TB"]/100
+SubgroupPlot$subgroup <- as.character(SubgroupPlot$subgroup)
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "New"] <- "1.New Case"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Old"] <- "2.Previously Treated Case"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Young"] <- "3.Young age [15,25)"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Middle"] <- "4.Middle age [25,60)"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Senior"] <- "5.Old age [60,108]"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "DOTS"] <- "7.Public DOTS Retesting"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "Referral"] <-"6.Private Public Referral"
+SubgroupPlot$subgroup[SubgroupPlot$subgroup %in% "WalkIn"] <-"8.Walk In"
+SubgroupPlot$subgroup <- as.factor(SubgroupPlot$subgroup)
+
+SubgroupPlotOrigin <- SubgroupPlot
+# SubgroupPlot <- SubgroupPlotOrigin
+# Choose the DL System
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "CAD4TB", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "IF2", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "JF1", ]
+# SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "Lunit", ]
+SubgroupPlot <- SubgroupPlotOrigin[SubgroupPlotOrigin$DeepLearningSystem %in% "qXR", ]
+
+### GO TO AND RUN source("Chapter/Subgroup Table/SubGroupPlot.R")
+###################################################################
+
+
+
 
 SubgroupPlot$NNT <- 1/SubgroupPlot$ppv
 SubgroupPlot$NNT_H <- 1/SubgroupPlot$PPV_L

@@ -1,5 +1,5 @@
 source("radiologist.R")
-# CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
+CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
 CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv")
 
 
@@ -20,11 +20,13 @@ roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, MDF)
 
 roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, MDF)
 
-# library(pROC)
-# roc1 <- roc(Xpert2Outcome_num ~ CAD4TB6, MDF)
-# roc2 <- roc(Xpert2Outcome_num ~ qXRv3_100, MDF)
-# cov(roc1, roc2, method="obuchowski")
-# cov(roc1, roc2, method="delong")
+### PRC 
+
+library("PRROC")
+
+pr.curve(scores.class0 = MDF[MDF$Xpert2Outcome_num %in% "0", 29], scores.class1 = MDF[MDF$Xpert2Outcome_num %in% "1", 29])
+  
+
 
 # base <- ggplot(CAD_Xpert_plot, aes(X, Sens, color = DeepLearningSystem)) + geom_path()+ geom_ribbon(aes(x = X, ymin = Sens_L, ymax = Sens_H), fill = "red", alpha= 0.2)
 
@@ -50,7 +52,7 @@ ggROC <- ggROC + geom_point(data = Radiologist, mapping = aes(X, Sens, shape = A
 ggROC
 
 
-  tiff("Results/Figure-2 ROCs.tif", width = 10, height = 7.9, units = "in", res = 100)
+tiff("Results/Figure-2 ROCs.tif", width = 10, height = 7.9, units = "in", res = 100)
 ggROC
 dev.off()
 
