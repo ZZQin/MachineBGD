@@ -18,10 +18,15 @@ Young <- MDF[MDF$AgeGroup %in% "[15,25)",]
 Middle <- MDF[MDF$AgeGroup %in% "[25,60)",]
 Senior <- MDF[MDF$AgeGroup %in% "[60,108]",]
 
-Referral <- subset(MDF, MDF$UseCase %in% "PrivatePublicReferral")
-DOTS <- subset(MDF, MDF$UseCase %in% "PublicDOTSRetesting")
-WalkIn <- subset(MDF, MDF$UseCase %in% "WalkIn")
+PrivateReferral <-subset(MDF, MDF$UseCase %in% "PrivateReferral")
+PublicReferral <-subset(MDF, MDF$UseCase %in% "PublicReferral")
+DOTS <-subset(MDF, MDF$UseCase %in% "PublicDOTSRetesting")
+WalkIn <-subset(MDF, MDF$UseCase %in% "WalkIn")
+Community <-subset(MDF, MDF$UseCase %in% "Community screening")
+Contacts <-subset(MDF, MDF$UseCase %in% "Contacts")
 # Missing <- subset(MDF, is.na(MDF$UseCase)==T)
+
+
 
 New_long <- MDF_long[MDF_long$TB.Medication.History %in% "No",]
 Old_long <- MDF_long[MDF_long$TB.Medication.History %in% "Yes",]
@@ -29,15 +34,19 @@ Young_long <- MDF_long[MDF_long$AgeGroup %in% "[15,25)",]
 Middle_long <- MDF_long[MDF_long$AgeGroup %in% "[25,60)",]
 Senior_long <- MDF_long[MDF_long$AgeGroup %in% "[60,108]",]
 
-Referral_long  <- subset(MDF_long, MDF_long$UseCase %in% "PrivatePublicReferral")
-DOTS_long  <- subset(MDF_long, MDF_long$UseCase %in% "PublicDOTSRetesting")
-WalkIn_long  <- subset(MDF_long, MDF_long$UseCase %in% "WalkIn")
+
+PrivateReferral_long <-subset(MDF_long, MDF_long$UseCase %in% "PrivateReferral")
+PublicReferral_long <-subset(MDF_long, MDF_long$UseCase %in% "PublicReferral")
+DOTS_long <-subset(MDF_long, MDF_long$UseCase %in% "PublicDOTSRetesting")
+WalkIn_long <-subset(MDF_long, MDF_long$UseCase %in% "WalkIn")
+Community_long <-subset(MDF_long, MDF_long$UseCase %in% "Community screening")
+Contacts_long <-subset(MDF_long, MDF_long$UseCase %in% "Contacts")
+# Missing <- subset(MDF_long, is.na(MDF_long$UseCase)==T)
 
 ```
 
 ```{r 2 AUC}
 ## All
-
 library(precrec)
 library(ggplot2)
 
@@ -73,7 +82,7 @@ l <- ROCPRC(New)
 New <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 New$subgroup <- "New cases"
 
-## Old only
+## Old on ly
 l <- ROCPRC(Old)
 Old <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 Old$subgroup <- "Previously treated cases"
@@ -93,10 +102,18 @@ l <- ROCPRC(Senior)
 Senior <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 Senior$subgroup <- "Old age"
 
-## Referral only
-l <- ROCPRC(Referral)
-Referral <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
-Referral$subgroup <- "Referred"
+
+
+## PrivateReferral only
+l <- ROCPRC(PrivateReferral)
+PrivateReferral <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
+PrivateReferral$subgroup <- "PrivateReferral"
+
+## PublicReferral only
+l <- ROCPRC(PublicReferral)
+PublicReferral <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
+PublicReferral$subgroup <- "PublicReferral"
+
 
 ## DOTS only
 l <- ROCPRC(DOTS)
@@ -107,6 +124,20 @@ DOTS$subgroup <- "DOTS retested"
 l <- ROCPRC(WalkIn)
 WalkIn <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 WalkIn$subgroup <- "WalkIn"
+
+
+## Community only
+l <- ROCPRC(Community)
+Community <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
+Community$subgroup <- "Community"
+
+
+## Contacts only
+l <- ROCPRC(Contacts)
+Contacts <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
+Contacts$subgroup <- "Contacts"
+
+
 
 ## Female
 l <- ROCPRC(Female)
@@ -120,7 +151,8 @@ Male$subgroup <- "Male"
 #### stratification by age AND prior TB history
 
 
-aucTable <- rbind(all, New, Old, Young, Middle, Senior, Referral, DOTS, WalkIn, Female, Male)
+aucTable <- rbind(all, New, Old, Young, Middle, Senior, PrivateReferral, PublicReferral, DOTS, WalkIn,Community, Contacts, Female, Male)
+
 colnames(aucTable) <- c("AI.Algorithm", "AUC", "PCAUC", "Subgroup")
 write.csv(aucTable, "Results/aucTable.csv")
 rm(list=(ls()))
@@ -189,11 +221,11 @@ write.csv(ROCaucTable, "Results/ROCaucTable.csv", row.names = F)
 aucTable <- read.csv("Results/aucTable.csv")
 aucTable <- aucTable[, -1]
 
-aucTable$Subgroup <- factor(aucTable$Subgroup, levels = c("Young age", "Middle age", "Old age", "Referred", "DOTS retested", "WalkIn", "New cases", "Previously treated cases", "Female", "Male"))
+aucTable$Subgroup <- factor(aucTable$Subgroup, levels = c("All","Young age", "Middle age", "Old age", "PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts", "New cases", "Previously treated cases", "Female", "Male"))
 ### AUC
 age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
-referral<-ggplot(aucTable[aucTable$Subgroup %in% c("Referred", "DOTS retested", "WalkIn"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+referral<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
 history<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
@@ -202,20 +234,18 @@ gender <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=A
 ### PRC
 agePC<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("Referred", "DOTS retested", "WalkIn"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
 historyPC<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
 genderPC <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
 
-tiff("Results/PRC ROC AUC plot.tif", width = 18, height = 8, units = "in", res = 100)
+tiff("Results/PRC ROC AUC plot 3.tif", width = 20, height = 8, units = "in", res = 110)
 require(gridExtra)
-
 grid.arrange(age, referral, history, gender, agePC, referralPC, historyPC, genderPC, ncol=4)
-# grid.arrange(age, referral, history, ncol=3)
-
 dev.off()
+
 # rm(age, referral, history, agePC, referralPC, historyPC, gender, genderPC)
 
 tiff("Results/PRC AUC plot.tif", width = 9, height = 8, units = "in", res = 100)

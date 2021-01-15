@@ -31,40 +31,44 @@ rm(AI, Human, humanAI)
 humanAI <- read_csv("Results/humanAI.csv")
 
 
-humanAI$specD <- percent(humanAI[, 9]- humanAI[, 4])
+humanAI$specD <- percent(humanAI$AI_Spec- humanAI$Huan_Spec)
+humanAI$PPVD <- percent(humanAI$AI_PPV- humanAI$Huan_PPV)
+humanAI$NPVD <- percent(humanAI$AI_NPV- humanAI$Huan_NPV)
+
+
 # humanAI <- humanAI[, c(1,2,3,5:8, 10, 9,4)]
-# colnames(humanAI) <- c("Human Benchmark", "Sensitivity", "Specificy", "DL Product", "Score", "DL Sensitivity", "DL Specificity", "Difference", "specAI", "specH")
+# colnames(humanAI) <- c("Human Benchmark", "Sensitivity", "Specificy", "DL Product", "Score", "DL Sensitivity", "DL Specificity", "Difference", "AI_Spec", "specH")
 
 
 ### McNemar test specificity 
 healthy <- sum(MDF$Xpert2Outcome_num %in% "0")
 
 # library(readr)
-# humanAI <- read_csv("Results/humanAI.csv", 
-#                     col_types = cols(`Diff.specificity` = col_number()))
+# humanAI <- read_csv("Results/humanAI.csv", col_types = cols(`Diff.specificity` = col_number()))
+
 humanAI$specCI <- ""
 
 for (i in 1:15){
-  test <- prop.test(x=c(humanAI$specAI[i]*healthy, healthy*humanAI$specH[i]), n=c(healthy, healthy))
-  humanAI$CI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
+  test <- prop.test(x=c(humanAI$AI_Spec[i]*healthy, healthy*humanAI$Huan_Spec[i]), n=c(healthy, healthy))
+  humanAI$specCI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
   # return(humanAI)
 }
 
 
-humanAI$specCI <- ""
+humanAI$PPVCI <- ""
 
 for (i in 1:15){
-  test <- prop.test(x=c(humanAI$specAI[i]*healthy, healthy*humanAI$specH[i]), n=c(healthy, healthy))
-  humanAI$CI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
+  test <- prop.test(x=c(humanAI$AI_PPV[i]*healthy, healthy*humanAI$Huan_PPV[i]), n=c(healthy, healthy))
+  humanAI$PPVCI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
   # return(humanAI)
 }
 
 
-humanAI$specCI <- ""
+humanAI$NPVCI <- ""
 
 for (i in 1:15){
-  test <- prop.test(x=c(humanAI$specAI[i]*healthy, healthy*humanAI$specH[i]), n=c(healthy, healthy))
-  humanAI$CI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
+  test <- prop.test(x=c(humanAI$AI_NPV[i]*healthy, healthy*humanAI$Huan_NPV[i]), n=c(healthy, healthy))
+  humanAI$NPVCI[i] <- paste0(percent(test$conf.int[1], suffix = ""), "-", percent(test$conf.int[2]))
   # return(humanAI)
 }
 
@@ -75,5 +79,5 @@ humanAI[2:5, 1:3] <- " "
 humanAI[7:10, 1:3] <- " "
 humanAI[12:15, 1:3] <- " "
 View(humanAI)
-write.csv(humanAI, "Results/humanAI.csv", row.names = F)
+write.csv(humanAI, "Results/table4.csv", row.names = F)
 # rm(AI, Human)
