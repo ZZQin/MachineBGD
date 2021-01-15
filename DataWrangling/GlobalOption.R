@@ -31,10 +31,21 @@ Mode <- function(x) {
 # MDF <- read.csv("DataWrangling/MDF.csv")
 MDF <- read.csv("DataWrangling/MDF.6.3.csv")
 
-MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]
+# RM <- MDF[(is.na(MDF$UseCase)==T) & MDF$GXP.Result %in% "MTB Not Detected" & MDF$Radiology.Result %in% "X-Ray Normal", ]
+# RM <- RM[1:48, ]
+# MDF <- MDF[!MDF$PID_OMRS %in% RM$PID_OMRS, ]
+
+summary(MDF$UseCase)
+
+
+# 
+# MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]
 sum(is.na(MDF$GXP.Result)==T)
 MDF <- MDF[is.na(MDF$Radiology.Result)==F, ]
 MDF <- MDF[MDF$Age >=15, ]
+summary(MDF$Radiology.Result) # removing 16 images that were marked  unclear
+MDF <- MDF[MDF$Radiology.Result != "", ]
+MDF <- MDF[MDF$Radiology.Result != "Image Unclear", ]
 
 
 # Make it long

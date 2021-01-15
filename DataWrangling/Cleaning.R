@@ -33,12 +33,12 @@ SymptomData <- read_excel("DataWrangling/ScreeningData.xlsx")
 
 Master_df <- merge(Master_df, SymptomData, by.x = "PID_OMRS", by.y = "OpenMRS Identification Number", all.x = TRUE)
 
-# # Delft 6.0.0
-# CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", header = T, fill = T)
-# colnames(CAD6_delft)[7] <- "TID_Delft"
-# CAD6_delft <- CAD6_delft[, -2]
-# CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
-
+# Delft 6.0.0
+CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", header = T, fill = T)
+colnames(CAD6_delft)[7] <- "TID_Delft"
+CAD6_delft <- CAD6_delft[, -2]
+CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
+# 
 # Delft 6.3.0
 CAD6_delft <- read.table(file = "DataWrangling/Delft 6.3.0.csv", sep = ",", header = T, fill = T)
 names(CAD6_delft)[1] <- "TID_Delft"
@@ -69,14 +69,13 @@ Master_df <- (Master_df[Master_df$PID_OMRS %in% n_occur$Var1[n_occur$Freq < 2], 
 n_occur <- data.frame(table(Master_df$TID_OMRS))
 MasterDF1TID <- (Master_df[Master_df$TID_OMRS %in% n_occur$Var1[n_occur$Freq == 1], ]) # MasterDF1TID is a subset withOUT duplicated TID
 
-
-# ###  Clean Delft 
-# # CAD6_delft <- CAD6_delft[grep("^.{12}$",CAD6_delft$TID_Delft), ]  #TID_Delft is 
-# DeDuDelft_CAD6 <- CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TB6")]), ]
-# n_occur <- data.frame(table(DeDuDelft_CAD6$TID_Delft))
-# # But I decided to discard all records with the same TID with different CAD6 (due to inability to trace the true identify of them). 1857 are removed
-# DelftClean <- DeDuDelft_CAD6[DeDuDelft_CAD6$TID_Delft %in% n_occur$Var1[n_occur$Freq == 1], ] # A df with just unique TID from Delft that don't have different CAD6 score --> 26051
-# rm(DeDuDelft_CAD6)
+###  Clean Delft
+# CAD6_delft <- CAD6_delft[grep("^.{12}$",CAD6_delft$TID_Delft), ]  #TID_Delft is
+DeDuDelft_CAD6 <- CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TB6")]), ]
+n_occur <- data.frame(table(DeDuDelft_CAD6$TID_Delft))
+# But I decided to discard all records with the same TID with different CAD6 (due to inability to trace the true identify of them). 1857 are removed
+DelftClean <- DeDuDelft_CAD6[DeDuDelft_CAD6$TID_Delft %in% n_occur$Var1[n_occur$Freq == 1], ] # A df with just unique TID from Delft that don't have different CAD6 score --> 26051
+rm(DeDuDelft_CAD6)
 
 
 
