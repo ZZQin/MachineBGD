@@ -3,7 +3,9 @@ knitr::opts_chunk$set(fig.width=15, fig.height=12, echo=FALSE, warning=FALSE, me
 ```
 
 
-```{r eval=F}
+```{r run manually eval=F}
+rm(list = ls()) 
+
 source("DataWrangling/GlobalOption.R")
 source("radiologist.R")
 Radiologist <- Radiologist[Radiologist$Referral %in% "MDF", ]
@@ -24,47 +26,28 @@ DOTS <-subset(MDF, MDF$UseCase %in% "PublicDOTSRetesting")
 WalkIn <-subset(MDF, MDF$UseCase %in% "WalkIn")
 Community <-subset(MDF, MDF$UseCase %in% "Community screening")
 Contacts <-subset(MDF, MDF$UseCase %in% "Contacts")
-# Missing <- subset(MDF, is.na(MDF$UseCase)==T)
-
-
-
-New_long <- MDF_long[MDF_long$TB.Medication.History %in% "No",]
-Old_long <- MDF_long[MDF_long$TB.Medication.History %in% "Yes",]
-Young_long <- MDF_long[MDF_long$AgeGroup %in% "[15,25)",]
-Middle_long <- MDF_long[MDF_long$AgeGroup %in% "[25,60)",]
-Senior_long <- MDF_long[MDF_long$AgeGroup %in% "[60,108]",]
-
-
-PrivateReferral_long <-subset(MDF_long, MDF_long$UseCase %in% "PrivateReferral")
-PublicReferral_long <-subset(MDF_long, MDF_long$UseCase %in% "PublicReferral")
-DOTS_long <-subset(MDF_long, MDF_long$UseCase %in% "PublicDOTSRetesting")
-WalkIn_long <-subset(MDF_long, MDF_long$UseCase %in% "WalkIn")
-Community_long <-subset(MDF_long, MDF_long$UseCase %in% "Community screening")
-Contacts_long <-subset(MDF_long, MDF_long$UseCase %in% "Contacts")
-# Missing <- subset(MDF_long, is.na(MDF_long$UseCase)==T)
-
 ```
 
-```{r 2 AUC}
+```{r 2 AUCs in subgroups}
 ## All
 library(precrec)
 library(ggplot2)
 
 ROCPRC <- function(dataset){
   attr <- attributes(evalmod(scores = dataset$CAD4TB6, labels = dataset$Xpert2Outcome_num))
-  aucT1 <- c("CAD4TB ", round(attr$auc[4],3))
+  aucT1 <- c("CAD4TB ", round(attr$auc[4],4))
   
   attr <- attributes(evalmod(scores = dataset$qXRv3, labels = dataset$Xpert2Outcome_num))
-  aucT2 <- c("qXR ", round(attr$auc[4],3))
+  aucT2 <- c("qXR ", round(attr$auc[4],4))
   
   attr <- attributes(evalmod(scores = dataset$LunitScore, labels = dataset$Xpert2Outcome_num))
-  aucT3 <- c("Lunit INSIGHT CXR", round(attr$auc[4],3))
+  aucT3 <- c("Lunit INSIGHT CXR", round(attr$auc[4],4))
   
   attr <- attributes(evalmod(scores = dataset$JF1, labels = dataset$Xpert2Outcome_num))
-  aucT4 <- c("JF CXR-1", round(attr$auc[4],3))
+  aucT4 <- c("JF CXR-1", round(attr$auc[4],4))
   
   attr <- attributes(evalmod(scores = dataset$IF2, labels = dataset$Xpert2Outcome_num))
-  aucT5 <- c("InferReadDR ", round(attr$auc[4],3))
+  aucT5 <- c("InferReadDR ", round(attr$auc[4],4))
   
   # return(mmcurves)
   # return(autoplot(mmcurves))
@@ -82,7 +65,7 @@ l <- ROCPRC(New)
 New <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 New$subgroup <- "New cases"
 
-## Old on ly
+## Old only
 l <- ROCPRC(Old)
 Old <- data.frame(matrix(unlist(l), nrow=5, byrow=T))
 Old$subgroup <- "Previously treated cases"
@@ -153,7 +136,7 @@ Male$subgroup <- "Male"
 
 aucTable <- rbind(all, New, Old, Young, Middle, Senior, PrivateReferral, PublicReferral, DOTS, WalkIn,Community, Contacts, Female, Male)
 
-colnames(aucTable) <- c("AI.Algorithm", "AUC", "PCAUC", "Subgroup")
+colnames(aucTable) <- c("AI.Algorithm", "AUC", "PRAUC", "Subgroup")
 write.csv(aucTable, "Results/aucTable.csv")
 rm(list=(ls()))
 ```
@@ -161,14 +144,13 @@ rm(list=(ls()))
 
 
 ```{r ROC AUC with CI}
-
 library(pROC)
 ROC <- function(dataset){
   roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, dataset)
   roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, dataset)
-  roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore_100, dataset)
-  roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, dataset)
-  roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, dataset)
+  roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore, dataset)
+  roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1, dataset)
+  roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2, dataset)
 
   aucT <- as.data.frame(matrix(c(roc_CAD6[2], roc_CAD6[1], roc_CAD6[3], roc_qure[2], roc_qure[1], roc_qure[3], roc_Lunit[2], roc_Lunit[1], roc_Lunit[3], roc_JF1[2], roc_JF1[1], roc_JF1[3], roc_IF2[2], roc_IF2[1], roc_IF2[3]),  byrow=TRUE, ncol =  3))
   names(aucT) <- c("AUC", "AUCL", "AUCH")
@@ -199,79 +181,140 @@ Middle$subgroup <- "Middle age"
 Senior <- ROC(Senior)
 Senior$subgroup <- "Old age"
 
-## Referral only
-Referral <- ROC(Referral)
-Referral$subgroup <- "Referred"
+## PrivateReferral only
+PrivateReferral <- ROC(PrivateReferral)
+PrivateReferral$subgroup <- "PrivateReferral"
+
+## PublicReferral only
+PublicReferral <- ROC(PublicReferral)
+PublicReferral$subgroup <- "PublicReferral"
 
 ## DOTS only
 DOTS <- ROC(DOTS)
 DOTS$subgroup <- "DOTS retested"
 
-## Walk-in only
+
+## WalkIn only
 WalkIn <- ROC(WalkIn)
 WalkIn$subgroup <- "WalkIn"
 
-ROCaucTable <- rbind(New, Old, Young, Middle, Senior, Referral, DOTS, WalkIn)
+
+## Community only
+Community <- ROC(Community)
+Community$subgroup <- "Community"
+
+
+## Contacts only
+Contacts <- ROC(Contacts)
+Contacts$subgroup <- "Contacts"
+
+
+## Female only
+Female <- ROC(Female)
+Female$subgroup <- "Female"
+
+
+## Male only
+Male <- ROC(Male)
+Male$subgroup <- "Male"
+
+
+
+ROCaucTable <- rbind(New, Old, Young, Middle, Senior, PrivateReferral, PublicReferral, DOTS, WalkIn,Community, Contacts, Female, Male)
 View(ROCaucTable)
 write.csv(ROCaucTable, "Results/ROCaucTable.csv", row.names = F)
 ```
 
 
 ```{r Bar chart}
+rm(list = ls()) 
+
 aucTable <- read.csv("Results/aucTable.csv")
 aucTable <- aucTable[, -1]
 
-aucTable$Subgroup <- factor(aucTable$Subgroup, levels = c("All","Young age", "Middle age", "Old age", "PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts", "New cases", "Previously treated cases", "Female", "Male"))
+aucTable$Subgroup <- factor(aucTable$Subgroup, levels = c("All","Young age", "Middle age", "Old age", "PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts", "New cases", "Previously treated cases", "Female", "Male"))
 ### AUC
-age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+# age<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+ geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+# 
+# 
+# referral<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+# 
+# history<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90) + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+# 
+# gender <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+ geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90) +theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
-referral<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 
-history<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+### AUC with CI
+ROCaucTable <- read.csv("Results/ROCaucTable.csv")
+ROCaucTable$AUC <- round(ROCaucTable$AUC, 4)
 
-gender <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=AUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+ROCaucTable$subgroup <- factor(ROCaucTable$subgroup, levels = c("All","Young age", "Middle age", "Old age", "PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts", "New cases", "Previously treated cases", "Female", "Male"))
+
+age <-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge()) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.7)) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90) + theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+age
+
+referral<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal() + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6)) 
+referral
+
+history<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6))
+
+gender<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6))
 
 ### PRC
-agePC<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+agePC<-ggplot(aucTable[aucTable$Subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=PRAUC, fill=Subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge())+ geom_text(aes(label=PRAUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+referralPC<-ggplot(aucTable[aucTable$Subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=PRAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+ geom_text(aes(label=PRAUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+theme_minimal()+ theme(legend.position = "top")+  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-historyPC<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
+historyPC<-ggplot(aucTable[aucTable$Subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=PRAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+ geom_text(aes(label=PRAUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+theme_minimal() + theme(legend.position = "top") +  ylim(0.3, 0.8) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.8, 0.05), breaks = seq(0.3, 0.8, 0.05)) 
 
-genderPC <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=PCAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+genderPC <- ggplot(aucTable[aucTable$Subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=PRAUC, fill=Subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+ geom_text(aes(label=PRAUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+
+# 
+# tiff("Results/PRC ROC AUC plot 3.tif", width = 20, height = 8, units = "in", res = 110)
+# require(gridExtra)
+# grid.arrange(age, referral, history, gender, agePC, referralPC, historyPC, genderPC, ncol=4)
+# dev.off()
 
 
-tiff("Results/PRC ROC AUC plot 3.tif", width = 20, height = 8, units = "in", res = 110)
+tiff("Results/Figure3_250.tif", width = 12, height = 14, units = "in", res = 250)
 require(gridExtra)
-grid.arrange(age, referral, history, gender, agePC, referralPC, historyPC, genderPC, ncol=4)
+grid.arrange(age, referral, history, gender, agePC, referralPC, historyPC, genderPC, ncol=2)
 dev.off()
 
-# rm(age, referral, history, agePC, referralPC, historyPC, gender, genderPC)
 
-tiff("Results/PRC AUC plot.tif", width = 9, height = 8, units = "in", res = 100)
-grid.arrange(agePC, referralPC, historyPC, genderPC, ncol=2)
-dev.off()
+ 
+# tiff("Results/PRC AUC plot.tif", width = 9, height = 8, units = "in", res = 100)
+# grid.arrange(agePC, referralPC, historyPC, genderPC, ncol=2)
+# dev.off()
 ```
 
 ```{r}
 ROCaucTable <- read.csv("Results/ROCaucTable.csv")
-ROCaucTable$subgroup <- factor(ROCaucTable$subgroup, levels = c("Young age", "Middle age", "Old age", "Referred", "DOTS retested", "WalkIn", "New cases", "Previously treated cases"))
-### AUC
-age <-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge()) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.7)) + theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
+ROCaucTable$AUC <- round(ROCaucTable$AUC, 3)
+
+ROCaucTable$subgroup <- factor(ROCaucTable$subgroup, levels = c("All","Young age", "Middle age", "Old age", "PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts", "New cases", "Previously treated cases", "Female", "Male"))
+
+
+
+
+### AUC with CI
+age <-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Young age", "Middle age", "Old age"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) +  geom_bar(stat="identity", width=0.6, position=position_dodge()) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.7)) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90) + theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) 
 age
 
-referral<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Referred", "DOTS retested", "WalkIn"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal()+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6)) 
+referral<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("PrivateReferral", "PublicReferral", "DOTS retested", "WalkIn", "Community", "Contacts"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.7, position=position_dodge())+theme_minimal() + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(legend.position = "top")+  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6)) 
 referral
 
-history<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6))
+history<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("New cases", "Previously treated cases"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6))
 
-tiff("Results/ROC_AUC plot.tif", width = 13, height = 3, units = "in", res = 100)
+gender<-ggplot(ROCaucTable[ROCaucTable$subgroup %in% c("Female", "Male"), ], aes(x=AI.Algorithm, y=AUC, fill=subgroup)) + geom_bar(stat="identity", width=0.5, position=position_dodge())+theme_minimal() + theme(legend.position = "top") +  ylim(0, 0.95) + geom_text(aes(label=AUC), position=position_dodge(width=0.9), vjust=0.05, hjust = 1.5, angle=90)+ theme(panel.grid.minor = element_line(size=0.5)) + scale_y_continuous(minor_breaks = seq(0 , 0.95, 0.05), breaks = seq(0.65, 0.95, 0.05)) + geom_errorbar(aes(ymin=AUCL, ymax=AUCH), width=.2, position=position_dodge(0.6))
+
+
+
+tiff("Results/Figure4.tif", width = 12, height = 7, units = "in", res = 250)
 require(gridExtra)
-
-grid.arrange(age, referral, history, ncol=3)
-
+grid.arrange(age, referral, history, gender, ncol=2)
 dev.off()
-rm(age, referral, history)
+
 ```
 
 

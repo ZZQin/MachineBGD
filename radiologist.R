@@ -131,7 +131,7 @@ rval$elements[c(59, 55, 51, 47)]
 
 Any <- rval$elements[c(59, 55, 51, 47)]
 
-rm(TP, FP, TN, FN)
+rm(TP, FP, TN, FN, Any, rval)
 
 
 

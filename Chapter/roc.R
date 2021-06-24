@@ -1,41 +1,40 @@
 source("radiologist.R")
-# CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE.csv")
 CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv")
 
+# MDF <- read.csv("DataWrangling/MDF.6.3.csv")
+# MDF <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Nepal_Cameroon.csv")
 
 CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
-
-# MDF <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Nepal_Cameroon.csv")
 
 Radiologist <- Radiologist[Radiologist$Referral %in% "MDF", ]
 
 # CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
 
 CAD_Xpert_plot <- CAD_Xpert_plot[!CAD_Xpert_plot$DeepLearningSystem %in% c("IF1", "JF2", "IF3", "InferReadDR", "JF CXR-1", "Lunit INSIGHT CXR", "qXR"), ]
+
 roc_CAD6 <- ci.auc(Xpert2Outcome_num ~ CAD4TB6, MDF)
 roc_qure <- ci.auc(Xpert2Outcome_num ~ qXRv3_100, MDF)
 roc_Lunit <- ci.auc(Xpert2Outcome_num ~ LunitScore_100, MDF)
 roc_JF1 <- ci.auc(Xpert2Outcome_num ~ JF1_100, MDF)
 roc_IF2 <- ci.auc(Xpert2Outcome_num ~ IF2_100, MDF)
 
-# roc_CAD6 <- roc(Xpert2Outcome_num ~ CAD4TB6, MDF)
-# roc_qure <- roc(Xpert2Outcome_num ~ qXRv3_100, MDF)
-# roc_Lunit <- roc(Xpert2Outcome_num ~ LunitScore_100, MDF)
-# roc_JF1 <- roc(Xpert2Outcome_num ~ JF1_100, MDF)
-# roc_IF2 <- roc(Xpert2Outcome_num ~ IF2_100, MDF)
-# 
-# roc.test(roc_CAD6, roc_qure)
-# roc.test(roc_CAD6, roc_Lunit)
-# roc.test(roc_CAD6, roc_JF1)
-# roc.test(roc_CAD6, roc_IF2)
-# roc.test(roc_qure, roc_Lunit)
-# 
-# roc.test(roc_qure, roc_JF1)
-# roc.test(roc_qure, roc_IF2)
-# roc.test(roc_Lunit, roc_JF1)
-# roc.test(roc_Lunit, roc_IF2)
-# 
-# roc.test(roc_JF1, roc_IF2)
+roc_CAD6 <- roc(Xpert2Outcome_num ~ CAD4TB6, MDF)
+roc_qure <- roc(Xpert2Outcome_num ~ qXRv3_100, MDF)
+roc_Lunit <- roc(Xpert2Outcome_num ~ LunitScore_100, MDF)
+roc_JF1 <- roc(Xpert2Outcome_num ~ JF1_100, MDF)
+roc_IF2 <- roc(Xpert2Outcome_num ~ IF2_100, MDF)
+
+roc.test(roc_CAD6, roc_qure)
+roc.test(roc_CAD6, roc_Lunit)
+roc.test(roc_CAD6, roc_JF1)
+roc.test(roc_CAD6, roc_IF2)
+roc.test(roc_qure, roc_Lunit)
+
+roc.test(roc_qure, roc_JF1)
+roc.test(roc_qure, roc_IF2)
+roc.test(roc_Lunit, roc_JF1)
+roc.test(roc_Lunit, roc_IF2)
+roc.test(roc_JF1, roc_IF2)
 
 ### PRC 
 
