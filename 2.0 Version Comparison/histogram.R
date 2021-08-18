@@ -1,5 +1,4 @@
-source("DataWrangling/GlobalOption.R")
-
+source("2.0 Version Comparison/radiologist.R")
 
 table(MDF_long$DeepLearningSystem)
 MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
@@ -17,7 +16,7 @@ p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogra
 hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#f7f7f7", "#fbb4b9", "#91003f", "#a1dab4", "#006d2c"))
 
 
-tiff("Results/Histogram.tif", width = 14, height = 8, units = "in", res = 100)
+tiff("2.0 Version Comparison//Histogram.tif", width = 14, height = 8, units = "in", res = 100)
 hist
 dev.off()
 
@@ -26,7 +25,7 @@ p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogra
 density <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "bottom") +scale_fill_manual(values=c("#f7f7f7", "#fbb4b9", "#91003f", "#a1dab4", "#006d2c"))+ scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0 , 100, 10)) 
 density
 
-tiff("Results/density.tif", width = 10, height = 6, units = "in", res = 100)
+tiff("2.0 Version Comparison/density.tif", width = 10, height = 6, units = "in", res = 100)
 density
 dev.off()
 
@@ -39,7 +38,7 @@ dev.off()
 # hist_New <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top")+ scale_color_brewer(palette="Accent")
 # # + geom_density(alpha=.4)
 # 
-# tiff("Results/Histogram New.tif", width = 14, height = 8, units = "in", res = 100)
+# tiff("2.0 Version Comparison/Histogram New.tif", width = 14, height = 8, units = "in", res = 100)
 # hist_New
 # dev.off()
 
@@ -48,7 +47,7 @@ dev.off()
 # hist_Old <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top")+ scale_color_brewer(palette="Accent")
 # # + geom_density(alpha=.4)
 # 
-# tiff("Results/Histogram Old.tif", width = 14, height = 8, units = "in", res = 100)
+# tiff("2.0 Version Comparison/Histogram Old.tif", width = 14, height = 8, units = "in", res = 100)
 # hist_Old
 # dev.off()
 

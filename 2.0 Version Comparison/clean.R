@@ -55,11 +55,12 @@ CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", h
 colnames(CAD6_delft)[7] <- "TID_Delft"
 CAD6_delft <- CAD6_delft[, -2]
 CAD6_delft <- CAD6_delft[, c(1, 2, 6, 9, 10)]
+names(CAD6_delft)[5] <- "CAD4TBv6"
 # 
 # Delft CAD4TB7
 CAD7_delft <- read.table(file = "DataWrangling/Delft 6.3.0.csv", sep = ",", header = T, fill = T)
 names(CAD7_delft)[1] <- "TID_Delft"
-names(CAD7_delft)[2] <- "CAD4TB7"
+names(CAD7_delft)[2] <- "CAD4TBv7"
 
 # qXR V 2 & 3
 QA2.BGD <- read.csv(file = "./AI Scores/qXRv2.csv", header=T, sep=",")
@@ -76,7 +77,7 @@ MasterDF1TID <- (Master_df[Master_df$TID_OMRS %in% n_occur$Var1[n_occur$Freq == 
 rm(n_occur)
 ###  Clean Delft
 # CAD6_delft <- CAD6_delft[grep("^.{12}$",CAD6_delft$TID_Delft), ]  #TID_Delft is
-DeDuDelft_CAD6 <- CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TB6")]), ]
+DeDuDelft_CAD6 <- CAD6_delft[!duplicated(CAD6_delft[c("TID_Delft",  "CAD4TBv6")]), ]
 n_occur <- data.frame(table(DeDuDelft_CAD6$TID_Delft))
 # But I decided to discard all records with the same TID with different CAD6 (due to inability to trace the true identify of them). 1857 are removed
 DelftClean <- DeDuDelft_CAD6[DeDuDelft_CAD6$TID_Delft %in% n_occur$Var1[n_occur$Freq == 1], ] # A df with just unique TID from Delft that don't have different CAD6 score --> 26051
@@ -94,37 +95,33 @@ rm(MDF_Delft)
 
 ### Save csv ##
 MDF <- MDF_Delft_qxr23
-write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
+# write.csv(MDF, "2.0 Version Comparison/MDF.csv", row.names = F)
 rm(list = ls(all.names = TRUE))
 
 
-MDF <- read.csv("DataWrangling/MDF.csv")
 
-MDF$qXRv3_100 <- MDF$qXRv3*100
-
-
+### Clean all ----
+MDF <- read.csv("2.0 Version Comparison/MDF.csv")
 
 MDF$Symptoms <- "1"
 MDF$Symptoms[MDF$Cough %in% "No" & MDF$Fever %in% "No" & MDF$`Active Breathing Shortness` %in% "No" & MDF$`Weight Loss` %in% "No" & MDF$Haemoptysis %in% "No"] <- "0"
 
-
-
-
-## Subset 
-# MDF <- subset(MDF, MDF$Age > 15)
-# MDF <- subset(MDF, is.na(MDF$Xpert2Outcome_num)==F)
-MDF <- subset(MDF, is.na(MDF$CAD4TB6)==F)
-MDF <- subset(MDF, is.na(MDF$qXRv3)==F)
-MDF <- MDF[MDF$CAD4TB6 !="-1",]
 MDF$AgeGroup [MDF$Age<25]<- "[15,25)"
 MDF$AgeGroup [MDF$Age>=25 & MDF$Age<60]<- "[25,60)"
 MDF$AgeGroup [MDF$Age>=60]<- "[60,108]"
 
-
 MDF <- MDF[, -c(3,4)]
+
+MDF <- subset(MDF, is.na(MDF$CAD4TBv6)==F)
+MDF <- subset(MDF, is.na(MDF$CAD4TBv7)==F)
+MDF <- subset(MDF, is.na(MDF$qXRv2)==F)
+MDF <- subset(MDF, is.na(MDF$qXRv3)==F)
+MDF <- MDF[MDF$CAD4TBv6 !="-1",]
+MDF <- MDF[MDF$CAD4TBv7 !="-1",]
+
+
 Master_df <- read.csv("AI Scores/Master_df.csv")
 MDF$Referral <- Master_df$type[match(MDF$PID_OMRS, Master_df$PID)]
-
 MDF_Original <- MDF
 
 #### Referral Source -----------------------
@@ -141,11 +138,12 @@ Classification_ZZ$ReferralUnit <- tolower(Classification_ZZ$ReferralUnit)
 MDF$UseCase <- Classification_ZZ$Unit[match(MDF$ReferralSource, Classification_ZZ$ReferralUnit)]
 table(MDF$UseCase)
 
-
-#### Save  -----------------------
-# write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
-# write.csv(MDF, "DataWrangling/MDF.6.3.csv", row.names = F)
 rm(Classification_ZZ, Referral, Master_df)
 
+## conver to the scale of 0-100
 
+MDF$qXRv2 <- MDF$qXRv2*100
+MDF$qXRv3 <- MDF$qXRv3*100
 
+#### Save  -----------------------
+write.csv(MDF, "2.0 Version Comparison/MDF.csv", row.names = F)

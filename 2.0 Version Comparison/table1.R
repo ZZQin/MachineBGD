@@ -1,4 +1,4 @@
-source("DataWrangling/GlobalOption.R")
+source("2.0 Version Comparison/Global.R")
 
 # MDF$qXRv3 <- MDF$qXRv3*100
 # MDF$LunitScore <- MDF$LunitScore*100
@@ -62,7 +62,7 @@ colnames(T1) <- c("", "Overall", "Xpert Positive", "Xpert Negative", "p test", "
 # T1$N <- TEMP
 # T1 <- T1[, c(10, 2,3, 5:8)]
 # rm(TEMP)
-write.csv(T1, "Results/Table 1.csv", row.names = FALSE)
+write.csv(T1, "2.0 Version Comparison//Table 1.csv", row.names = FALSE)
 
 
 # knitr::kable(T1, row.names = FALSE, caption = "Table 1 Demographic and Clinical Characteristics of People Screened with Chest X-ray and Xpert MTB/RIF")

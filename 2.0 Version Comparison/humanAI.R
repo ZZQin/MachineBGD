@@ -1,7 +1,7 @@
-source("radiologist.R")
+source("2.0 Version Comparison/radiologist.R")
 
 ########### Human vs AI ####################
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert_CAD6.3.csv")
+CAD_Xpert_plot <- read.csv("2.0 Version Comparison//CAD_Xpert_CAD6.3.csv")
 CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
 
 
@@ -24,11 +24,11 @@ AI <- AI[grep("Radiologists' ", AI$Comment), ]
 
 humanAI <- cbind(Human, AI)
 
-# write.csv(humanAI, "Results/HumanAI.csv", row.names = F)
+# write.csv(humanAI, "2.0 Version Comparison//HumanAI.csv", row.names = F)
 
 rm(AI, Human, humanAI)
 
-humanAI <- read_csv("Results/humanAI.csv")
+humanAI <- read_csv("2.0 Version Comparison//humanAI.csv")
 
 
 humanAI$specD <- percent(humanAI$AI_Spec- humanAI$Huan_Spec)
@@ -44,7 +44,7 @@ humanAI$NPVD <- percent(humanAI$AI_NPV- humanAI$Huan_NPV)
 healthy <- sum(MDF$Xpert2Outcome_num %in% "0")
 
 # library(readr)
-# humanAI <- read_csv("Results/humanAI.csv", col_types = cols(`Diff.specificity` = col_number()))
+# humanAI <- read_csv("2.0 Version Comparison//humanAI.csv", col_types = cols(`Diff.specificity` = col_number()))
 
 humanAI$specCI <- ""
 

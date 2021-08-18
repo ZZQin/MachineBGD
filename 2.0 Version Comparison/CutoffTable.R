@@ -1,9 +1,5 @@
-# Nepal_Cameroon <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Clean/Nepal_Cameroon.csv", header = T)
-# Nepal_Cameroon <- Nepal_Cameroon[, -1]
-# NPL <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "NPL", ]
-# CAM <- Nepal_Cameroon[Nepal_Cameroon$Country %in% "CAM", ]
-
-source("DataWrangling/GlobalOption.R")
+source("2.0 Version Comparison/Global.R")
+source("2.0 Version Comparison/radiologist.R")
 # maxV <- 10001
 # sep <- 0.0001
 # sepdeflt <- 0.01
@@ -34,335 +30,99 @@ myfunction <- function(CountryX, DL.System, car.cutoff){
   return(accuracy)
 }
 
-################ Nepal #####################################
-
-# ### qXR, Lunit, Infervision, JF1 ------------
-# DL.score <- seq(0, 1, by = sep)
-# mylist <- NULL
-# mylist <- as.list(mylist)
-# 
-# 
-# # NPL_qXR3
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(NPL, NPL$qXR3, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# NPL.qXR3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# NPL.qXR3$Country  <- paste("NPL")
-# NPL.qXR3$DeepLearningSystem <- paste("qXR")
-# 
-# NPL.qXR3$Comment <- ""
-# NPL.qXR3$Comment[which(abs(NPL.qXR3$X13-0.5) == min(abs(NPL.qXR3$X13-0.5)))] <- "1/2 Xpert Saved"
-# NPL.qXR3$Comment[which(abs(NPL.qXR3$X13-2/3) == min(abs(NPL.qXR3$X13-2/3)))] <- "2/3 Xpert Saved"
-# NPL.qXR3$Comment[which(abs(NPL.qXR3$X13-0.75) == min(abs(NPL.qXR3$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # NPL.qXR3$Comment[which(abs(NPL.qXR3$X1-Radiologist$Sens[1]) == min(abs(NPL.qXR3$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # NPL.qXR3$Comment[which(abs(NPL.qXR3$X1-Radiologist$Sens[2]) == min(abs(NPL.qXR3$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # NPL.qXR3$Comment[which(abs(NPL.qXR3$X1-Radiologist$Sens[3]) == min(abs(NPL.qXR3$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# 
-# 
-# 
-# # NPL_Lunit
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(NPL, NPL$Lunit, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# NPL.Lunit <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# NPL.Lunit$Country  <- paste("NPL")
-# NPL.Lunit$DeepLearningSystem <- paste("Lunit")
-# NPL.Lunit$Comment <- ""
-# NPL.Lunit$Comment[which(abs(NPL.Lunit$X13-0.5) == min(abs(NPL.Lunit$X13-0.5)))] <- "1/2 Xpert Saved"
-# NPL.Lunit$Comment[which(abs(NPL.Lunit$X13-2/3) == min(abs(NPL.Lunit$X13-2/3)))] <- "2/3 Xpert Saved"
-# NPL.Lunit$Comment[which(abs(NPL.Lunit$X13-0.75) == min(abs(NPL.Lunit$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # NPL.Lunit$Comment[which(abs(NPL.Lunit$X1-Radiologist$Sens[1]) == min(abs(NPL.Lunit$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # NPL.Lunit$Comment[which(abs(NPL.Lunit$X1-Radiologist$Sens[2]) == min(abs(NPL.Lunit$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # NPL.Lunit$Comment[which(abs(NPL.Lunit$X1-Radiologist$Sens[3]) == min(abs(NPL.Lunit$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# 
-# 
-# # NPL_Infervision
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(NPL, NPL$Infervision, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# NPL.Infervision <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# NPL.Infervision$Country  <- paste("NPL")
-# NPL.Infervision$DeepLearningSystem <- paste("Infervision")
-# NPL.Infervision$Comment <- ""
-# NPL.Infervision$Comment[which(abs(NPL.Infervision$X13-0.5) == min(abs(NPL.Infervision$X13-0.5)))] <- "1/2 Xpert Saved"
-# NPL.Infervision$Comment[which(abs(NPL.Infervision$X13-2/3) == min(abs(NPL.Infervision$X13-2/3)))] <- "2/3 Xpert Saved"
-# NPL.Infervision$Comment[which(abs(NPL.Infervision$X13-0.75) == min(abs(NPL.Infervision$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # NPL.Infervision$Comment[which(abs(NPL.Infervision$X1-Radiologist$Sens[1]) == min(abs(NPL.Infervision$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # NPL.Infervision$Comment[which(abs(NPL.Infervision$X1-Radiologist$Sens[2]) == min(abs(NPL.Infervision$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # NPL.Infervision$Comment[which(abs(NPL.Infervision$X1-Radiologist$Sens[3]) == min(abs(NPL.Infervision$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# # NPL_JF1
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(NPL, NPL$JF1, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# NPL.JF1 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# NPL.JF1$Country  <- paste("NPL")
-# NPL.JF1$DeepLearningSystem <- paste("JF1")
-# NPL.JF1$Comment <- ""
-# NPL.JF1$Comment[which(abs(NPL.JF1$X13-0.5) == min(abs(NPL.JF1$X13-0.5)))] <- "1/2 Xpert Saved"
-# NPL.JF1$Comment[which(abs(NPL.JF1$X13-2/3) == min(abs(NPL.JF1$X13-2/3)))] <- "2/3 Xpert Saved"
-# NPL.JF1$Comment[which(abs(NPL.JF1$X13-0.75) == min(abs(NPL.JF1$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # NPL.JF1$Comment[which(abs(NPL.JF1$X1-Radiologist$Sens[1]) == min(abs(NPL.JF1$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # NPL.JF1$Comment[which(abs(NPL.JF1$X1-Radiologist$Sens[2]) == min(abs(NPL.JF1$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # NPL.JF1$Comment[which(abs(NPL.JF1$X1-Radiologist$Sens[3]) == min(abs(NPL.JF1$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# ### CAD4TB------------
-# DL.score <- seq(0, 100, by = sepdeflt)
-# # NPL_CAD4TB6
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(NPL, NPL$CAD4TB6, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# NPL.CAD4TB6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# NPL.CAD4TB6$Country  <- paste("NPL")
-# NPL.CAD4TB6$DeepLearningSystem <- paste("CAD4TB")
-# NPL.CAD4TB6$Comment <- ""
-# NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X13-0.5) == min(abs(NPL.CAD4TB6$X13-0.5)))] <- "1/2 Xpert Saved"
-# NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X13-2/3) == min(abs(NPL.CAD4TB6$X13-2/3)))] <- "2/3 Xpert Saved"
-# NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X13-0.75) == min(abs(NPL.CAD4TB6$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X1-Radiologist$Sens[1]) == min(abs(NPL.CAD4TB6$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X1-Radiologist$Sens[2]) == min(abs(NPL.CAD4TB6$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # NPL.CAD4TB6$Comment[which(abs(NPL.CAD4TB6$X1-Radiologist$Sens[3]) == min(abs(NPL.CAD4TB6$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# NPL.DF <- rbind(NPL.qXR3, NPL.Lunit, NPL.Infervision, NPL.JF1, NPL.CAD4TB6)
-# rm(NPL.qXR3, NPL.Lunit, NPL.Infervision, NPL.JF1, NPL.CAD4TB6)
-# 
-# 
-# ################ Cameroon #####################################
-# 
-# ### qXR, Lunit, Infervision, JF1 ------------
-# DL.score <- seq(0, 1, by = sep)
-# mylist <- NULL
-# mylist <- as.list(mylist)
-# 
-# 
-# # CAM_qXR3
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(CAM, CAM$qXR3, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# 
-# 
-# CAM.qXR3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# CAM.qXR3$Country  <- paste("CAM")
-# CAM.qXR3$DeepLearningSystem <- paste("qXR")
-# 
-# CAM.qXR3$Comment <- ""
-# CAM.qXR3$Comment[which(abs(CAM.qXR3$X13-0.5) == min(abs(CAM.qXR3$X13-0.5)))] <- "1/2 Xpert Saved"
-# CAM.qXR3$Comment[which(abs(CAM.qXR3$X13-2/3) == min(abs(CAM.qXR3$X13-2/3)))] <- "2/3 Xpert Saved"
-# CAM.qXR3$Comment[which(abs(CAM.qXR3$X13-0.75) == min(abs(CAM.qXR3$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # CAM.qXR3$Comment[which(abs(CAM.qXR3$X1-Radiologist$Sens[1]) == min(abs(CAM.qXR3$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # CAM.qXR3$Comment[which(abs(CAM.qXR3$X1-Radiologist$Sens[2]) == min(abs(CAM.qXR3$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # CAM.qXR3$Comment[which(abs(CAM.qXR3$X1-Radiologist$Sens[3]) == min(abs(CAM.qXR3$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# 
-# 
-# 
-# # CAM_Lunit
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(CAM, CAM$Lunit, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# CAM.Lunit <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# CAM.Lunit$Country  <- paste("CAM")
-# CAM.Lunit$DeepLearningSystem <- paste("Lunit")
-# CAM.Lunit$Comment <- ""
-# CAM.Lunit$Comment[which(abs(CAM.Lunit$X13-0.5) == min(abs(CAM.Lunit$X13-0.5)))] <- "1/2 Xpert Saved"
-# CAM.Lunit$Comment[which(abs(CAM.Lunit$X13-2/3) == min(abs(CAM.Lunit$X13-2/3)))] <- "2/3 Xpert Saved"
-# CAM.Lunit$Comment[which(abs(CAM.Lunit$X13-0.75) == min(abs(CAM.Lunit$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # CAM.Lunit$Comment[which(abs(CAM.Lunit$X1-Radiologist$Sens[1]) == min(abs(CAM.Lunit$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # CAM.Lunit$Comment[which(abs(CAM.Lunit$X1-Radiologist$Sens[2]) == min(abs(CAM.Lunit$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # CAM.Lunit$Comment[which(abs(CAM.Lunit$X1-Radiologist$Sens[3]) == min(abs(CAM.Lunit$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# 
-# 
-# # CAM_Infervision
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(CAM, CAM$Infervision, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# CAM.Infervision <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# CAM.Infervision$Country  <- paste("CAM")
-# CAM.Infervision$DeepLearningSystem <- paste("Infervision")
-# CAM.Infervision$Comment <- ""
-# CAM.Infervision$Comment[which(abs(CAM.Infervision$X13-0.5) == min(abs(CAM.Infervision$X13-0.5)))] <- "1/2 Xpert Saved"
-# CAM.Infervision$Comment[which(abs(CAM.Infervision$X13-2/3) == min(abs(CAM.Infervision$X13-2/3)))] <- "2/3 Xpert Saved"
-# CAM.Infervision$Comment[which(abs(CAM.Infervision$X13-0.75) == min(abs(CAM.Infervision$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # CAM.Infervision$Comment[which(abs(CAM.Infervision$X1-Radiologist$Sens[1]) == min(abs(CAM.Infervision$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # CAM.Infervision$Comment[which(abs(CAM.Infervision$X1-Radiologist$Sens[2]) == min(abs(CAM.Infervision$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # CAM.Infervision$Comment[which(abs(CAM.Infervision$X1-Radiologist$Sens[3]) == min(abs(CAM.Infervision$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# # CAM_JF1
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(CAM, CAM$JF1, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# CAM.JF1 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# CAM.JF1$Country  <- paste("CAM")
-# CAM.JF1$DeepLearningSystem <- paste("JF1")
-# CAM.JF1$Comment <- ""
-# CAM.JF1$Comment[which(abs(CAM.JF1$X13-0.5) == min(abs(CAM.JF1$X13-0.5)))] <- "1/2 Xpert Saved"
-# CAM.JF1$Comment[which(abs(CAM.JF1$X13-2/3) == min(abs(CAM.JF1$X13-2/3)))] <- "2/3 Xpert Saved"
-# CAM.JF1$Comment[which(abs(CAM.JF1$X13-0.75) == min(abs(CAM.JF1$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # CAM.JF1$Comment[which(abs(CAM.JF1$X1-Radiologist$Sens[1]) == min(abs(CAM.JF1$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # CAM.JF1$Comment[which(abs(CAM.JF1$X1-Radiologist$Sens[2]) == min(abs(CAM.JF1$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # CAM.JF1$Comment[which(abs(CAM.JF1$X1-Radiologist$Sens[3]) == min(abs(CAM.JF1$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# ### CAD4TB ------------
-# DL.score <- seq(0, 100, by = sepdeflt)
-# # CAM_CAD4TB6
-# for (i in 1 : maxV){
-#   cutoff.accuracy <- myfunction(CAM, CAM$CAD4TB6, DL.score[i])
-#   mylist[[i]] <- list(cutoff.accuracy)
-# }
-# CAM.CAD4TB6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-# CAM.CAD4TB6$Country  <- paste("CAM")
-# CAM.CAD4TB6$DeepLearningSystem <- paste("CAD4TB")
-# CAM.CAD4TB6$Comment <- ""
-# CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X13-0.5) == min(abs(CAM.CAD4TB6$X13-0.5)))] <- "1/2 Xpert Saved"
-# CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X13-2/3) == min(abs(CAM.CAD4TB6$X13-2/3)))] <- "2/3 Xpert Saved"
-# CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X13-0.75) == min(abs(CAM.CAD4TB6$X13-0.75)))] <- "3/4 Xpert Saved"
-# 
-# # CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X1-Radiologist$Sens[1]) == min(abs(CAM.CAD4TB6$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-# # CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X1-Radiologist$Sens[2]) == min(abs(CAM.CAD4TB6$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-# # CAM.CAD4TB6$Comment[which(abs(CAM.CAD4TB6$X1-Radiologist$Sens[3]) == min(abs(CAM.CAD4TB6$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-# 
-# CAM.DF <- rbind(CAM.qXR3, CAM.Lunit, CAM.Infervision, CAM.JF1, CAM.CAD4TB6)
-# rm(CAM.qXR3, CAM.Lunit, CAM.Infervision, CAM.JF1, CAM.CAD4TB6)
-
-################ Bangladesh #####################################
-source("radiologist.R")
-BGD <- MDF[, ]
-names(BGD)[23] <- "CAD4TB6"
-names(BGD)[24] <- "qXR3"
-names(BGD)[25] <- "Lunit"
-names(BGD)[26]<- "JF1"
-names(BGD)[29] <- "Infervision"
-names(BGD)[13] <- "XPERT_pos"
 
 
-### qXR, Lunit, Infervision, JF1 ------------
-DL.score <- seq(0, 1, by = sep)
-mylist <- NULL
-mylist <- as.list(mylist)
-
-
-# BGD_qXR3
-for (i in 1 : maxV){
-  cutoff.accuracy <- myfunction(BGD, BGD$qXR3, DL.score[i])
-  mylist[[i]] <- list(cutoff.accuracy)
-}
-
-
-BGD.qXR3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-BGD.qXR3$Country  <- paste("BGD")
-BGD.qXR3$DeepLearningSystem <- paste("qXR")
-
-BGD.qXR3$Comment <- ""
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X13-0.5) == min(abs(BGD.qXR3$X13-0.5)))] <- "1/2 Xpert Saved"
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X13-2/3) == min(abs(BGD.qXR3$X13-2/3)))] <- "2/3 Xpert Saved"
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X13-0.75) == min(abs(BGD.qXR3$X13-0.75)))] <- "3/4 Xpert Saved"
-
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X1-Radiologist$Sens[1]) == min(abs(BGD.qXR3$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X1-Radiologist$Sens[2]) == min(abs(BGD.qXR3$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-BGD.qXR3$Comment[which(abs(BGD.qXR3$X1-Radiologist$Sens[3]) == min(abs(BGD.qXR3$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
+names(MDF)[13] <- "XPERT_pos"
 
 
 
-
-# BGD_Lunit
-for (i in 1 : maxV){
-  cutoff.accuracy <- myfunction(BGD, BGD$Lunit, DL.score[i])
-  mylist[[i]] <- list(cutoff.accuracy)
-}
-BGD.Lunit <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-BGD.Lunit$Country  <- paste("BGD")
-BGD.Lunit$DeepLearningSystem <- paste("Lunit")
-BGD.Lunit$Comment <- ""
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X13-0.5) == min(abs(BGD.Lunit$X13-0.5)))] <- "1/2 Xpert Saved"
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X13-2/3) == min(abs(BGD.Lunit$X13-2/3)))] <- "2/3 Xpert Saved"
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X13-0.75) == min(abs(BGD.Lunit$X13-0.75)))] <- "3/4 Xpert Saved"
-
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X1-Radiologist$Sens[1]) == min(abs(BGD.Lunit$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X1-Radiologist$Sens[2]) == min(abs(BGD.Lunit$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-BGD.Lunit$Comment[which(abs(BGD.Lunit$X1-Radiologist$Sens[3]) == min(abs(BGD.Lunit$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-
-
-
-# BGD_Infervision
-for (i in 1 : maxV){
-  cutoff.accuracy <- myfunction(BGD, BGD$Infervision, DL.score[i])
-  mylist[[i]] <- list(cutoff.accuracy)
-}
-BGD.Infervision <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-BGD.Infervision$Country  <- paste("BGD")
-BGD.Infervision$DeepLearningSystem <- paste("Infervision")
-BGD.Infervision$Comment <- ""
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X13-0.5) == min(abs(BGD.Infervision$X13-0.5)))] <- "1/2 Xpert Saved"
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X13-2/3) == min(abs(BGD.Infervision$X13-2/3)))] <- "2/3 Xpert Saved"
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X13-0.75) == min(abs(BGD.Infervision$X13-0.75)))] <- "3/4 Xpert Saved"
-
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X1-Radiologist$Sens[1]) == min(abs(BGD.Infervision$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X1-Radiologist$Sens[2]) == min(abs(BGD.Infervision$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-BGD.Infervision$Comment[which(abs(BGD.Infervision$X1-Radiologist$Sens[3]) == min(abs(BGD.Infervision$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-
-# BGD_JF1
-for (i in 1 : maxV){
-  cutoff.accuracy <- myfunction(BGD, BGD$JF1, DL.score[i])
-  mylist[[i]] <- list(cutoff.accuracy)
-}
-BGD.JF1 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-BGD.JF1$Country  <- paste("BGD")
-BGD.JF1$DeepLearningSystem <- paste("JF1")
-BGD.JF1$Comment <- ""
-BGD.JF1$Comment[which(abs(BGD.JF1$X13-0.5) == min(abs(BGD.JF1$X13-0.5)))] <- "1/2 Xpert Saved"
-BGD.JF1$Comment[which(abs(BGD.JF1$X13-2/3) == min(abs(BGD.JF1$X13-2/3)))] <- "2/3 Xpert Saved"
-BGD.JF1$Comment[which(abs(BGD.JF1$X13-0.75) == min(abs(BGD.JF1$X13-0.75)))] <- "3/4 Xpert Saved"
-
-BGD.JF1$Comment[which(abs(BGD.JF1$X1-Radiologist$Sens[1]) == min(abs(BGD.JF1$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-BGD.JF1$Comment[which(abs(BGD.JF1$X1-Radiologist$Sens[2]) == min(abs(BGD.JF1$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-BGD.JF1$Comment[which(abs(BGD.JF1$X1-Radiologist$Sens[3]) == min(abs(BGD.JF1$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
-
-### CAD4TB ------------
+### qXRv2------------
 DL.score <- seq(0, 100, by = sepdeflt)
-# BGD_CAD4TB6
+# MDF_qXRv2
 for (i in 1 : maxV){
-  cutoff.accuracy <- myfunction(BGD, BGD$CAD4TB6, DL.score[i])
+  cutoff.accuracy <- myfunction(MDF, MDF$qXRv2, DL.score[i])
   mylist[[i]] <- list(cutoff.accuracy)
 }
-BGD.CAD4TB6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
-BGD.CAD4TB6$Country  <- paste("BGD")
-BGD.CAD4TB6$DeepLearningSystem <- paste("CAD4TB")
-BGD.CAD4TB6$Comment <- ""
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X13-0.5) == min(abs(BGD.CAD4TB6$X13-0.5)))] <- "1/2 Xpert Saved"
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X13-2/3) == min(abs(BGD.CAD4TB6$X13-2/3)))] <- "2/3 Xpert Saved"
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X13-0.75) == min(abs(BGD.CAD4TB6$X13-0.75)))] <- "3/4 Xpert Saved"
+MDF.qXRv2 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.qXRv2$Country  <- paste("MDF")
+MDF.qXRv2$DeepLearningSystem <- paste("CAD4TB")
+MDF.qXRv2$Comment <- ""
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X13-0.5) == min(abs(MDF.qXRv2$X13-0.5)))] <- "1/2 Xpert Saved"
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X13-2/3) == min(abs(MDF.qXRv2$X13-2/3)))] <- "2/3 Xpert Saved"
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X13-0.75) == min(abs(MDF.qXRv2$X13-0.75)))] <- "3/4 Xpert Saved"
 
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X1-Radiologist$Sens[1]) == min(abs(BGD.CAD4TB6$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X1-Radiologist$Sens[2]) == min(abs(BGD.CAD4TB6$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
-BGD.CAD4TB6$Comment[which(abs(BGD.CAD4TB6$X1-Radiologist$Sens[3]) == min(abs(BGD.CAD4TB6$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X1-Radiologist$Sens[1]) == min(abs(MDF.qXRv2$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X1-Radiologist$Sens[2]) == min(abs(MDF.qXRv2$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
+MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X1-Radiologist$Sens[3]) == min(abs(MDF.qXRv2$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
 
-BGD.DF <- rbind(BGD.qXR3, BGD.Lunit, BGD.Infervision, BGD.JF1, BGD.CAD4TB6)
-rm(BGD.qXR3, BGD.Lunit, BGD.Infervision, BGD.JF1, BGD.CAD4TB6)
+
+### qXRv3------------
+DL.score <- seq(0, 100, by = sepdeflt)
+# MDF_qXRv3
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$qXRv3, DL.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.qXRv3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.qXRv3$Country  <- paste("MDF")
+MDF.qXRv3$DeepLearningSystem <- paste("CAD4TB")
+MDF.qXRv3$Comment <- ""
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X13-0.5) == min(abs(MDF.qXRv3$X13-0.5)))] <- "1/2 Xpert Saved"
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X13-2/3) == min(abs(MDF.qXRv3$X13-2/3)))] <- "2/3 Xpert Saved"
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X13-0.75) == min(abs(MDF.qXRv3$X13-0.75)))] <- "3/4 Xpert Saved"
+
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X1-Radiologist$Sens[1]) == min(abs(MDF.qXRv3$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X1-Radiologist$Sens[2]) == min(abs(MDF.qXRv3$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
+MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X1-Radiologist$Sens[3]) == min(abs(MDF.qXRv3$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
+
+
+### CAD4TBv6------------
+DL.score <- seq(0, 100, by = sepdeflt)
+# MDF_CAD4TBv6
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$CAD4TBv6, DL.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.CAD4TBv6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.CAD4TBv6$Country  <- paste("MDF")
+MDF.CAD4TBv6$DeepLearningSystem <- paste("CAD4TB")
+MDF.CAD4TBv6$Comment <- ""
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X13-0.5) == min(abs(MDF.CAD4TBv6$X13-0.5)))] <- "1/2 Xpert Saved"
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X13-2/3) == min(abs(MDF.CAD4TBv6$X13-2/3)))] <- "2/3 Xpert Saved"
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X13-0.75) == min(abs(MDF.CAD4TBv6$X13-0.75)))] <- "3/4 Xpert Saved"
+
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[1]) == min(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[2]) == min(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
+MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[3]) == min(abs(MDF.CAD4TBv6$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
+
+
+
+### CAD4TBv7------------
+DL.score <- seq(0, 100, by = sepdeflt)
+# MDF_CAD4TBv7
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$CAD4TBv7, DL.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.CAD4TBv7 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.CAD4TBv7$Country  <- paste("MDF")
+MDF.CAD4TBv7$DeepLearningSystem <- paste("CAD4TB")
+MDF.CAD4TBv7$Comment <- ""
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X13-0.5) == min(abs(MDF.CAD4TBv7$X13-0.5)))] <- "1/2 Xpert Saved"
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X13-2/3) == min(abs(MDF.CAD4TBv7$X13-2/3)))] <- "2/3 Xpert Saved"
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X13-0.75) == min(abs(MDF.CAD4TBv7$X13-0.75)))] <- "3/4 Xpert Saved"
+
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[1]) == min(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[1])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[1], sep = "")
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[2]) == min(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[2])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[2], sep = "")
+MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[3]) == min(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
+
+####
+MDF.DF <- rbind(MDF.qXRv3, MDF.qXRv2, MDF.CAD4TBv6, MDF.CAD4TBv7)
+rm(MDF.qXRv3, MDF.qXRv2, MDF.CAD4TBv6, MDF.CAD4TBv7)
 
 ######### Merge DFs ######
-# CAD_Xpert <- rbind(CAM.DF, NPL.DF, BGD.DF)
-CAD_Xpert <- BGD.DF
+# CAD_Xpert <- rbind(CAM.DF, NPL.DF, MDF.DF)
+CAD_Xpert <- MDF.DF
 
 
 colnames(CAD_Xpert)[1] <- "Sens"
@@ -413,14 +173,14 @@ tapply(CAD_Xpert$Score, CAD_Xpert$DeepLearningSystem, summary)
 
 
 ################ updating qXRv3 ----------------------
-# CAD_Xpert <- read.csv("Results/CAD_Xpert_Precise.csv")
+# CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_Precise.csv")
 # 
-# CAD_Xpert_noBGDqXR <- CAD_Xpert[!(CAD_Xpert$Site %in% "BGD" & CAD_Xpert$DeepLearningSystem %in% "qXR"), ]
+# CAD_Xpert_noMDFqXR <- CAD_Xpert[!(CAD_Xpert$Site %in% "MDF" & CAD_Xpert$DeepLearningSystem %in% "qXR"), ]
 # 
-# BGD.qXR3 <- BGD.qXR3[, c(1:23, 27:30, 24:26, 31 )]
-# colnames(CAD_Xpert_noBGDqXR)[13] <- "%XpertSaved"
+# MDF.qXR3 <- MDF.qXR3[, c(1:23, 27:30, 24:26, 31 )]
+# colnames(CAD_Xpert_noMDFqXR)[13] <- "%XpertSaved"
 # 
-# CAD_Xpert <- rbind(CAD_Xpert_noBGDqXR, BGD.qXR3)
+# CAD_Xpert <- rbind(CAD_Xpert_noMDFqXR, MDF.qXR3)
 
 
 ################################
@@ -428,22 +188,22 @@ SuppTable <- CAD_Xpert %>%
   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`)
 View(SuppTable)
 
-write.csv(SuppTable, "Results/Supp Tab_CAD6.3.csv", row.names = F)
+write.csv(SuppTable, "2.0 Version Comparison//Supp Tab_CAD6.3.csv", row.names = F)
 
 # CAD_Xpert_plot <- CAD_Xpert %>%
 #   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved.`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
 # 
 # 
-# # write.csv(CAD_Xpert, "Results/CAD_Xpert_Precise.csv", row.names = F)
-# # write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
+# # write.csv(CAD_Xpert, "2.0 Version Comparison//CAD_Xpert_Precise.csv", row.names = F)
+# # write.csv(CAD_Xpert_plot, "2.0 Version Comparison//CAD_Xpert Cutoffs TABLE.csv", row.names = F)
 # 
-# write.csv(CAD_Xpert_plot, "Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
-# write.csv(CAD_Xpert, "Results/CAD_Xpert_CAD6.3.csv", row.names = F)
+# write.csv(CAD_Xpert_plot, "2.0 Version Comparison//CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
+# write.csv(CAD_Xpert, "2.0 Version Comparison//CAD_Xpert_CAD6.3.csv", row.names = F)
 # 
-# # CAD_Xpert <- read.csv("Results/CAD_Xpert_CAD6.3.csv")
-# # CAD_Xpert <- read.csv("Results/CAD_Xpert_CAD.csv")
+# # CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_CAD6.3.csv")
+# # CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_CAD.csv")
 
 # 
-# rm(CAM.DF, NPL.DF, BGD.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, BGD.DF, BGD)
+# rm(CAM.DF, NPL.DF, MDF.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, MDF.DF, MDF)
 # 
 # 

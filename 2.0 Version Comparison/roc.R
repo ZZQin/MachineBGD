@@ -1,8 +1,7 @@
-source("radiologist.R")
-CAD_Xpert_plot <- read.csv("Results/CAD_Xpert Cutoffs TABLE_CAD6.3.csv")
+source("2.0 Version Comparison/radiologist.R")
+CAD_Xpert_plot <- read.csv("2.0 Version Comparison//CAD_Xpert Cutoffs TABLE_CAD6.3.csv")
 
-# MDF <- read.csv("DataWrangling/MDF.6.3.csv")
-# MDF <- read.csv(file = "C:/Users/zhizh/OneDrive - Stop TB Partnership/UNOPS/10 Paper Writing/CAR software/03 Nepal_Cameroon/CAR -- 03 Nepal_Cameroon/Nepal_Cameroon.csv")
+
 
 CAD_Xpert_plot <- subset(CAD_Xpert_plot, CAD_Xpert_plot$Site %in% "BGD")
 
