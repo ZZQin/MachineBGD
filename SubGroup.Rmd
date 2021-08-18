@@ -161,6 +161,7 @@ ROC <- function(dataset){
 }
 
 
+
 ## New only
 New <- ROC(New)
 New$subgroup <- "New cases"
@@ -288,7 +289,7 @@ dev.off()
 # dev.off()
 ```
 
-```{r}
+```{r bar with CI}
 ROCaucTable <- read.csv("Results/ROCaucTable.csv")
 ROCaucTable$AUC <- round(ROCaucTable$AUC, 3)
 

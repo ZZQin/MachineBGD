@@ -167,7 +167,7 @@ rm(MDF_Delft_qxr, CAD6_delft, DelftClean, Lunit, Master_df, SymptomData, QA.BGD,
 
 ## Subset 
 # MDF <- subset(MDF, MDF$Age > 15)
-MDF <- subset(MDF, is.na(MDF$Xpert2Outcome_num)==F)
+# MDF <- subset(MDF, is.na(MDF$Xpert2Outcome_num)==F)
 MDF <- subset(MDF, is.na(MDF$CAD4TB6)==F)
 MDF <- subset(MDF, is.na(MDF$qXRv3)==F)
 MDF <- MDF[MDF$CAD4TB6 !="-1",]
@@ -199,7 +199,7 @@ table(MDF$UseCase)
 
 #### Save  -----------------------
 # write.csv(MDF, "DataWrangling/MDF.csv", row.names = F)
-write.csv(MDF, "DataWrangling/MDF.6.3.csv", row.names = F)
+# write.csv(MDF, "DataWrangling/MDF.6.3.csv", row.names = F)
 rm(Classification_ZZ, Referral, Master_df)
 
 

@@ -35,8 +35,8 @@ MDF <- read.csv("DataWrangling/MDF.6.3.csv")
 # RM <- RM[1:48, ]
 # MDF <- MDF[!MDF$PID_OMRS %in% RM$PID_OMRS, ]
 
-summary(MDF$UseCase)
-
+table(MDF$UseCase)
+table(MDF$GXP.Result)
 
 # 
 # MDF <- MDF[!MDF$UseCase %in% c("Community screening", "Contacts"), ]

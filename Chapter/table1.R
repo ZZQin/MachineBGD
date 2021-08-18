@@ -1,11 +1,10 @@
 source("DataWrangling/GlobalOption.R")
 
-MDF$qXRv3 <- MDF$qXRv3*100
-MDF$LunitScore <- MDF$LunitScore*100
-MDF$IF2 <- MDF$IF2*100
-MDF$JF1 <- MDF$JF1*100
+# MDF$qXRv3 <- MDF$qXRv3*100
+# MDF$LunitScore <- MDF$LunitScore*100
+# MDF$IF1 <- MDF$IF*100
+# MDF$JF1 <- MDF$JF1*100
 
-MDF <- subset(MDF, MDF$Age > 15)
 library(tableone)
 # MDF <- MDF[MDF$Xpert2Outcome_num %in% "1", ]
 
@@ -20,7 +19,22 @@ table1 <- CreateTableOne(vars = listVar, strata=c("Xpert2Outcome_num"), data = M
 tableType <- CreateTableOne(vars = listVar, strata=c("Radiology.Result"), data = MDF, factorVars = catVars)
 table1.all <- CreateTableOne(vars = listVar, data = MDF, factorVars = catVars)
 tablethistory <- CreateTableOne(vars = listVar, strata=c("TB.Medication.History"), data = MDF, factorVars = catVars)
+# 
+# 
+# #### p-value ---------
+# summary(table1$CatTable)
+# summary(table1$ContTable)
+# 
+# 
+# summary(tableType$CatTable)
+# summary(tableType$ContTable)
+# 
+# summary(tablethistory$CatTable)
+# summary(tablethistory$ContTable)
 
+
+
+#### ---------
 
 
 table1 <- print(table1, nonnormal = c("Age", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
@@ -33,9 +47,12 @@ table1allDF <- data.frame(columnNameILike = row.names(table1all), table1all)
 tablethistory <- data.frame(columnNameILike = row.names(tablethistory), tablethistory)
 tabletypeDF <- data.frame(columnNameILike = row.names(tabletype), tabletype)
 
-T1 <- cbind(table1allDF, tablethistory, tabletypeDF)
+T1 <- cbind(table1allDF, table1DF, tablethistory, tabletypeDF)
+
 
 T1 <- T1[, c(1, 2, 5,4,6,10,9,11,14,16,15,17,18)]
+
+# T1 <- T1[, c(1, 2, 5,4,6,9,7,10)]
 
 colnames(T1) <- c("", "Overall", "Xpert Positive", "Xpert Negative", "p test", "TB History", "New Case", "p test", "Abnormal - Highly suggestive of TB", "Abnormal - Possibly TB", "Abnormal - not TB", "Normal", "p test")
 
