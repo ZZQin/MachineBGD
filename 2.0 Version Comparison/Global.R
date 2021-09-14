@@ -1,20 +1,25 @@
 library(ggplot2)
+library(plyr)
+library(tidyverse)
+library(dplyr)
+
+library(shiny)
+
 library(scales)
 library(epiR)
 library(ggthemes)
 library(RColorBrewer)
-library(plyr)
 library(reshape2)
 library(pROC) # contain function roc
-library(tidyverse)
-library(dplyr)
 library(lubridate)
 library(readxl)
 library(plotROC)
 library(flextable)
 library(DataExplorer)
 library(readxl)
-MDF <- read_csv("2.0 Version Comparison/MDF.csv")
+
+
+MDF <- read_csv("2.0 Version Comparison/MDF_resampled.csv")
 
 
 sum(is.na(MDF$GXP.Result)==T)
@@ -29,7 +34,7 @@ MDF <- MDF[MDF$Radiology.Result != "Image Unclear", ]
 
 # Make it long
 
-MDF_long <- gather(MDF, DeepLearningSystem, CAD4TBv6, CAD4TBv7, qXRv2, qXRv3)
+MDF_long <- gather(MDF, DeepLearningSystem, AbnormalityScore, CAD4TBv6, CAD4TBv7, qXRv2, qXRv3)
 
 MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
 MDF_long$Xpert2Outcome_num <- as.factor(MDF_long$Xpert2Outcome_num)

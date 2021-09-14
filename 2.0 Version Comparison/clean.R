@@ -147,3 +147,19 @@ MDF$qXRv3 <- MDF$qXRv3*100
 
 #### Save  -----------------------
 write.csv(MDF, "2.0 Version Comparison/MDF.csv", row.names = F)
+
+
+### Resampling
+MDF <- read_csv("2.0 Version Comparison/MDF.csv")
+
+### Resample: 1:2 match
+TB <- subset(MDF, MDF$Xpert2Outcome_num %in% "1")
+Normal <- subset(MDF, MDF$Xpert2Outcome_num %in% "0")
+# Random sampling 2 times that of TBy
+n <- length(TB$TID_OMRS)*2
+# merge the selected normal df with TB df
+MDF.S <- rbind(TB, Normal[sample(nrow(Normal), n), ])
+MDF <- MDF.S
+rm(TB, Normal, n, MDF.S)
+
+write.csv(MDF, "2.0 Version Comparison/MDF_resampled.csv", row.names = FALSE)

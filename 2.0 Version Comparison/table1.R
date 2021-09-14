@@ -1,15 +1,10 @@
 source("2.0 Version Comparison/Global.R")
 
-# MDF$qXRv3 <- MDF$qXRv3*100
-# MDF$LunitScore <- MDF$LunitScore*100
-# MDF$IF1 <- MDF$IF*100
-# MDF$JF1 <- MDF$JF1*100
-
 library(tableone)
 # MDF <- MDF[MDF$Xpert2Outcome_num %in% "1", ]
 
 # Define numeric variables
-listVar <- c("Age", "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "Radiology.Result", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2")
+listVar <- c("Age", "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "Radiology.Result", "CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3")
 
 #Define categorical variables
 catVars <- c( "AgeGroup", "Gender", "Cough", "Fever", "Active.Breathing.Shortness", "Weight.Loss","Haemoptysis", "Symptoms", "TB.Medication.History", "Xpert2Outcome_num", "MTB.Burden", "RIF.Result", "UseCase", "Radiology.Result")
@@ -37,10 +32,10 @@ tablethistory <- CreateTableOne(vars = listVar, strata=c("TB.Medication.History"
 #### ---------
 
 
-table1 <- print(table1, nonnormal = c("Age", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
-tabletype <- print(tableType, nonnormal = c("Age", "CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
-table1all <- print(table1.all, nonnormal = c("Age","CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
-tablethistory <- print(tablethistory, nonnormal = c("Age","CAD4TB6", "qXRv3", "LunitScore", "JF1", "IF1", "IF2"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+table1 <- print(table1, nonnormal = c("Age", "CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+tabletype <- print(tableType, nonnormal = c("Age","CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+table1all <- print(table1.all, nonnormal = c("Age","CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
+tablethistory <- print(tablethistory, nonnormal = c("Age","CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
 
 table1DF <- data.frame(columnNameILike = row.names(table1), table1)
 table1allDF <- data.frame(columnNameILike = row.names(table1all), table1all)

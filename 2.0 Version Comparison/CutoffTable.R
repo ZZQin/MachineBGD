@@ -5,7 +5,6 @@ source("2.0 Version Comparison/radiologist.R")
 # sepdeflt <- 0.01
 
 maxV<- 101
-sep <- 0.01
 sepdeflt <- 1
 
 ### Set up a function
@@ -38,6 +37,7 @@ names(MDF)[13] <- "XPERT_pos"
 
 ### qXRv2------------
 DL.score <- seq(0, 100, by = sepdeflt)
+mylist <- ""
 # MDF_qXRv2
 for (i in 1 : maxV){
   cutoff.accuracy <- myfunction(MDF, MDF$qXRv2, DL.score[i])
@@ -45,7 +45,7 @@ for (i in 1 : maxV){
 }
 MDF.qXRv2 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
 MDF.qXRv2$Country  <- paste("MDF")
-MDF.qXRv2$DeepLearningSystem <- paste("CAD4TB")
+MDF.qXRv2$DeepLearningSystem <- paste("qXRv2")
 MDF.qXRv2$Comment <- ""
 MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X13-0.5) == min(abs(MDF.qXRv2$X13-0.5)))] <- "1/2 Xpert Saved"
 MDF.qXRv2$Comment[which(abs(MDF.qXRv2$X13-2/3) == min(abs(MDF.qXRv2$X13-2/3)))] <- "2/3 Xpert Saved"
@@ -65,7 +65,7 @@ for (i in 1 : maxV){
 }
 MDF.qXRv3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
 MDF.qXRv3$Country  <- paste("MDF")
-MDF.qXRv3$DeepLearningSystem <- paste("CAD4TB")
+MDF.qXRv3$DeepLearningSystem <- paste("qXRv3")
 MDF.qXRv3$Comment <- ""
 MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X13-0.5) == min(abs(MDF.qXRv3$X13-0.5)))] <- "1/2 Xpert Saved"
 MDF.qXRv3$Comment[which(abs(MDF.qXRv3$X13-2/3) == min(abs(MDF.qXRv3$X13-2/3)))] <- "2/3 Xpert Saved"
@@ -85,7 +85,7 @@ for (i in 1 : maxV){
 }
 MDF.CAD4TBv6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
 MDF.CAD4TBv6$Country  <- paste("MDF")
-MDF.CAD4TBv6$DeepLearningSystem <- paste("CAD4TB")
+MDF.CAD4TBv6$DeepLearningSystem <- paste("CAD4TBv6")
 MDF.CAD4TBv6$Comment <- ""
 MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X13-0.5) == min(abs(MDF.CAD4TBv6$X13-0.5)))] <- "1/2 Xpert Saved"
 MDF.CAD4TBv6$Comment[which(abs(MDF.CAD4TBv6$X13-2/3) == min(abs(MDF.CAD4TBv6$X13-2/3)))] <- "2/3 Xpert Saved"
@@ -106,7 +106,7 @@ for (i in 1 : maxV){
 }
 MDF.CAD4TBv7 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
 MDF.CAD4TBv7$Country  <- paste("MDF")
-MDF.CAD4TBv7$DeepLearningSystem <- paste("CAD4TB")
+MDF.CAD4TBv7$DeepLearningSystem <- paste("CAD4TBv7")
 MDF.CAD4TBv7$Comment <- ""
 MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X13-0.5) == min(abs(MDF.CAD4TBv7$X13-0.5)))] <- "1/2 Xpert Saved"
 MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X13-2/3) == min(abs(MDF.CAD4TBv7$X13-2/3)))] <- "2/3 Xpert Saved"
@@ -117,14 +117,10 @@ MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[2]) == min(abs(M
 MDF.CAD4TBv7$Comment[which(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[3]) == min(abs(MDF.CAD4TBv7$X1-Radiologist$Sens[3])))] <- paste("Radiologists' specificity = ", Radiologist$Specificity[3], sep = "")
 
 ####
-MDF.DF <- rbind(MDF.qXRv3, MDF.qXRv2, MDF.CAD4TBv6, MDF.CAD4TBv7)
+CAD_Xpert <- rbind(MDF.qXRv3, MDF.qXRv2, MDF.CAD4TBv6, MDF.CAD4TBv7)
 rm(MDF.qXRv3, MDF.qXRv2, MDF.CAD4TBv6, MDF.CAD4TBv7)
 
 ######### Merge DFs ######
-# CAD_Xpert <- rbind(CAM.DF, NPL.DF, MDF.DF)
-CAD_Xpert <- MDF.DF
-
-
 colnames(CAD_Xpert)[1] <- "Sens"
 colnames(CAD_Xpert)[2] <- "Sens_L"
 colnames(CAD_Xpert)[3] <- "Sens_H"
@@ -158,29 +154,8 @@ CAD_Xpert$Specificity <- paste(percent(CAD_Xpert$Spec, accuracy = 0.1), " (", CA
 CAD_Xpert$PPV <- paste(percent(CAD_Xpert$ppv, accuracy = 0.1), " (", CAD_Xpert$PPV_95CI, ")", sep = "")
 CAD_Xpert$NPV <- paste(percent(CAD_Xpert$npv, accuracy = 0.1), " (", CAD_Xpert$NPV_95CI, ")", sep = "")
 CAD_Xpert$nnt <- paste(round(CAD_Xpert$NNT, 1), " (", round(CAD_Xpert$NNT_L, 1), "-", round(CAD_Xpert$NNT_H, 1), ")", sep = "")
-CAD_Xpert$`%XpertSaved%` <- round(CAD_Xpert$`%XpertSaved%`, 8)
+# CAD_Xpert$`%XpertSaved%` <- round(CAD_Xpert$`%XpertSaved%`, 3)
 CAD_Xpert$accuracy <- round(CAD_Xpert$accuracy, 3)
-
-CAD_Xpert$DeepLearningSystem <- as.character(CAD_Xpert$DeepLearningSystem)
-CAD_Xpert$DeepLearningSystem[CAD_Xpert$DeepLearningSystem %in% "Infervision"] <- "InferReadDR"
-CAD_Xpert$DeepLearningSystem[CAD_Xpert$DeepLearningSystem %in% "Lunit"] <- "Lunit INSIGHT CXR"
-CAD_Xpert$DeepLearningSystem[CAD_Xpert$DeepLearningSystem %in% "CAD4TB"] <- "CAD4TB"
-CAD_Xpert$DeepLearningSystem[CAD_Xpert$DeepLearningSystem %in% "qXR"] <- "qXR"
-CAD_Xpert$DeepLearningSystem[CAD_Xpert$DeepLearningSystem %in% "JF1"] <- "JF CXR-1"
-
-CAD_Xpert$Score[CAD_Xpert$DeepLearningSystem %in% "CAD4TB"] <- CAD_Xpert$Score[CAD_Xpert$DeepLearningSystem %in% "CAD4TB"]/100
-tapply(CAD_Xpert$Score, CAD_Xpert$DeepLearningSystem, summary)
-
-
-################ updating qXRv3 ----------------------
-# CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_Precise.csv")
-# 
-# CAD_Xpert_noMDFqXR <- CAD_Xpert[!(CAD_Xpert$Site %in% "MDF" & CAD_Xpert$DeepLearningSystem %in% "qXR"), ]
-# 
-# MDF.qXR3 <- MDF.qXR3[, c(1:23, 27:30, 24:26, 31 )]
-# colnames(CAD_Xpert_noMDFqXR)[13] <- "%XpertSaved"
-# 
-# CAD_Xpert <- rbind(CAD_Xpert_noMDFqXR, MDF.qXR3)
 
 
 ################################
@@ -188,20 +163,20 @@ SuppTable <- CAD_Xpert %>%
   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`)
 View(SuppTable)
 
-write.csv(SuppTable, "2.0 Version Comparison//Supp Tab_CAD6.3.csv", row.names = F)
+write.csv(SuppTable, "2.0 Version Comparison/Supp Tab.csv", row.names = F)
 
-# CAD_Xpert_plot <- CAD_Xpert %>%
-#   select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved.`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
+CAD_Xpert_plot <- CAD_Xpert %>%
+  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
 # 
 # 
-# # write.csv(CAD_Xpert, "2.0 Version Comparison//CAD_Xpert_Precise.csv", row.names = F)
-# # write.csv(CAD_Xpert_plot, "2.0 Version Comparison//CAD_Xpert Cutoffs TABLE.csv", row.names = F)
+# # write.csv(CAD_Xpert, "2.0 Version Comparison/CAD_Xpert_Precise.csv", row.names = F)
+# # write.csv(CAD_Xpert_plot, "2.0 Version Comparison/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
 # 
-# write.csv(CAD_Xpert_plot, "2.0 Version Comparison//CAD_Xpert Cutoffs TABLE_CAD6.3.csv", row.names = F)
-# write.csv(CAD_Xpert, "2.0 Version Comparison//CAD_Xpert_CAD6.3.csv", row.names = F)
-# 
-# # CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_CAD6.3.csv")
-# # CAD_Xpert <- read.csv("2.0 Version Comparison//CAD_Xpert_CAD.csv")
+write.csv(CAD_Xpert_plot, "2.0 Version Comparison/Cutoffs TABLE.csv", row.names = F)
+write.csv(CAD_Xpert, "2.0 Version Comparison/CAD_Xpert.csv", row.names = F)
+
+# CAD_Xpert <- read.csv("2.0 Version Comparison/CAD_Xpert_CAD6.3.csv")
+# CAD_Xpert <- read.csv("2.0 Version Comparison/CAD_Xpert_CAD.csv")
 
 # 
 # rm(CAM.DF, NPL.DF, MDF.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, MDF.DF, MDF)

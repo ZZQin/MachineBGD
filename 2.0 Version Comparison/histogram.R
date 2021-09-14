@@ -7,7 +7,6 @@ MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
 # MDF_long$DeepLearningSystem[grep("qXR", MDF_long$DeepLearningSystem)] <- "P3"
 # MDF_long$DeepLearningSystem[grep("Lunit INSIGHT CXR", MDF_long$DeepLearningSystem)] <- "P2"
 
-MDF_long <- MDF_long[!MDF_long$DeepLearningSystem %in% c("IF1", "JF2", "IF3"), ]
 
 
 
