@@ -19,7 +19,7 @@ as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
 
 Master_df <- read.csv(file = "DataWrangling/BGD.csv", header=T)
 Master_df$Result.Date <- mdy(Master_df$Radiology.Result.Date)
-Master_df$Result.Year <- quarter(Master_df$Result.Date)
+Master_df$Result.Year <- year(Master_df$Result.Date)
 
 Master_df$Xpert2Outcome_num <- as.character(Master_df$GXP.Result)
 Master_df$Xpert2Outcome_num[Master_df$GXP.Result %in% "MTB Detected"] <- "1"
@@ -139,6 +139,13 @@ MDF$UseCase <- Classification_ZZ$Unit[match(MDF$ReferralSource, Classification_Z
 table(MDF$UseCase)
 
 rm(Classification_ZZ, Referral, Master_df)
+
+
+# ###
+# Master_df <- Master_df %>% filter(Age >= 5 & Age <=15)
+# table(Master_df$Result.Year, Master_df$Xpert2Outcome_num)
+# Master_df$PID_OMRS[Master_df$Xpert2Outcome_num %in% "1"]
+# write.csv(Master_df, "C:/Users/zhizh/Stop TB Partnership/Digital AI Team - Documents/AI Team/1.3. Manuscripts/2.2. Children/BGD Children/00_Input_Data/Master_df.csv", row.names = FALSE)
 
 ## conver to the scale of 0-100
 

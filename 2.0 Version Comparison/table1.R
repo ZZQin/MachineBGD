@@ -30,8 +30,6 @@ tablethistory <- CreateTableOne(vars = listVar, strata=c("TB.Medication.History"
 
 
 #### ---------
-
-
 table1 <- print(table1, nonnormal = c("Age", "CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
 tabletype <- print(tableType, nonnormal = c("Age","CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)
 table1all <- print(table1.all, nonnormal = c("Age","CAD4TBv6", "CAD4TBv7", "qXRv2", "qXRv3"), cramVars = "Gender", catDigits = 1, contDigits = 1, noSpaces = TRUE)

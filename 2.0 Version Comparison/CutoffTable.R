@@ -20,12 +20,9 @@ myfunction <- function(CountryX, DL.System, car.cutoff){
   pv.positive <- as.vector(round((rval$elements$pv.positive),8))
   pv.negative <- as.vector(round((rval$elements$pv.negative),8))
   correct.rate <- (a+d)/length(CountryX$XPERT_pos)
-
   XpertSaved<- 1-round(sum(DL.System >= car.cutoff)/length(CountryX$Age), 8)
   Score <- DL.score[i]
-
   accuracy <- cbind(sensitivity, specificity, pv.positive, pv.negative, XpertSaved, Score, correct.rate)
-
   return(accuracy)
 }
 
