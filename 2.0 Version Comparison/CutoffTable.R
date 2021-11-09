@@ -155,27 +155,30 @@ CAD_Xpert$nnt <- paste(round(CAD_Xpert$NNT, 1), " (", round(CAD_Xpert$NNT_L, 1),
 CAD_Xpert$accuracy <- round(CAD_Xpert$accuracy, 3)
 
 
-################################
+########### Combine with Modeling#####################
+Modelling <- read_csv("2.0 Version Comparison/Modeling.csv")
+CAD_Xpert <- read_csv( "2.0 Version Comparison/CAD_Xpert.csv")
+
+Modelling$Index <- paste0(Modelling$AI, "_", Modelling$Score)
+CAD_Xpert$Index <- paste0(CAD_Xpert$DeepLearningSystem, "_", CAD_Xpert$Score)
+names(CAD_Xpert)
+CAD_Xpert <- CAD_Xpert[, -c(7:13, 18, 22:26, 29:31)]
+CAD_Xpert$PPV <- Modelling$ppv[match(Modelling$Index, CAD_Xpert$Index)]
+CAD_Xpert$NPV <- Modelling$npv[match(Modelling$Index, CAD_Xpert$Index)]
+CAD_Xpert$XpertSaved <- Modelling$XpertSaved[match(Modelling$Index, CAD_Xpert$Index)]
+CAD_Xpert$nnt <- Modelling$nnt[match(Modelling$Index, CAD_Xpert$Index)]
+CAD_Xpert$CAD_Pos <- Modelling$CAD_Pos[match(Modelling$Index, CAD_Xpert$Index)]
+
+
 SuppTable <- CAD_Xpert %>%
-  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`)
+  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, XpertSaved)
 View(SuppTable)
 
 write.csv(SuppTable, "2.0 Version Comparison/Supp Tab.csv", row.names = F)
 
 CAD_Xpert_plot <- CAD_Xpert %>%
-  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, `XpertSaved%`, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, ppv, PPV_L, PPV_H, npv, NPV_L, NPV_H, X)
-# 
-# 
-# # write.csv(CAD_Xpert, "2.0 Version Comparison/CAD_Xpert_Precise.csv", row.names = F)
-# # write.csv(CAD_Xpert_plot, "2.0 Version Comparison/CAD_Xpert Cutoffs TABLE.csv", row.names = F)
-# 
+  select(Site, DeepLearningSystem, Score, Sensitivity, Specificity, PPV, NPV,nnt, XpertSaved, Sens, Sens_L, Sens_H, Spec, Spec_L, Spec_H, X)
+
 write.csv(CAD_Xpert_plot, "2.0 Version Comparison/Cutoffs TABLE.csv", row.names = F)
-write.csv(CAD_Xpert, "2.0 Version Comparison/CAD_Xpert.csv", row.names = F)
+write.csv(CAD_Xpert, "2.0 Version Comparison/CAD_Xpert1.csv", row.names = F)
 
-# CAD_Xpert <- read.csv("2.0 Version Comparison/CAD_Xpert_CAD6.3.csv")
-# CAD_Xpert <- read.csv("2.0 Version Comparison/CAD_Xpert_CAD.csv")
-
-# 
-# rm(CAM.DF, NPL.DF, MDF.DF, i, DL.score, mylist, cutoff.accuracy, NPL, CAM, MDF.DF, MDF)
-# 
-# 

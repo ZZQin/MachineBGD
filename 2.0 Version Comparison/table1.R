@@ -17,8 +17,8 @@ tablethistory <- CreateTableOne(vars = listVar, strata=c("TB.Medication.History"
 # 
 # 
 # #### p-value ---------
-# summary(table1$CatTable)
-# summary(table1$ContTable)
+summary(table1$CatTable)
+summary(table1$ContTable)
 # 
 # 
 # summary(tableType$CatTable)

@@ -1,5 +1,4 @@
 # Model the effect 
-
 source("2.0 Version Comparison/Global.R")
 source("2.0 Version Comparison/radiologist.R")
 

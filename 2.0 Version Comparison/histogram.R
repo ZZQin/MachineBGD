@@ -63,3 +63,21 @@ paste(colnames(MDF)[32], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 32])
 paste(colnames(MDF)[23], ": ",round(skewness(MDF[MDF$Xpert2Outcome_num ==1, 23]),4), "vs", round(skewness(MDF[MDF$Xpert2Outcome_num ==0, 23]),4))
 
 # Mode(MDF[MDF$Xpert2Outcome_num ==1, 28])
+
+
+
+
+### Box plot 
+MDF_long$DeepLearningSystem <- as.factor(MDF_long$DeepLearningSystem )
+MDF_long <- MDF_long[! MDF_long$XpertHistory=="", ]
+BoxPlot <- ggplot(MDF_long, aes(x=AbnormalityScore, y=XpertHistory, fill=XpertHistory)) + 
+  geom_boxplot(alpha=0.6) +
+  theme_minimal() +
+  facet_wrap(~DeepLearningSystem) +
+  scale_fill_manual(values=c("#a1dab4", "#006d2c", "#fbb4b9", "#91003f"))+
+  theme(legend.position = "none", legend.title= element_blank()) + scale_x_continuous(minor_breaks = seq(0 , 100, 5), breaks = seq(0 ,100, 10))
+BoxPlot
+
+tiff("2.0 Version Comparison/BoxPlot.tif", width = 8, height = 3, units = "in", res = 100)
+BoxPlot
+dev.off()

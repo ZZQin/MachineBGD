@@ -5,11 +5,10 @@ source("2.0 Version Comparison/radiologist.R")
 ## for example, I declare the following values
 pop_size <- 54125
 prev <- 0.19
-XpertCost <- 20
+XpertCAD_Xpert <- 20
 # 
 maxV<- 101
-sep <- 0.01
-sepdeflt <- 1
+sep <- 1
 
 
 
@@ -33,7 +32,7 @@ myfunction <- function(dataset, AI.system, car.cutoff){
   return(accuracy)
 }
 
-################ MDF #####################################
+################ CAD4TBv7 #####################################
 AI.score <- seq(0, 100, by = sep)
 mylist <- NULL
 mylist <- as.list(mylist)
@@ -48,10 +47,55 @@ MDF.CAD4TBv7$Subgroup  <- paste("MDF")
 MDF.CAD4TBv7$AI <- paste("CAD4TBv7")
 
 
-######### Merge DFs ######
-CAD_Xpert <- MDF.CAD4TBv7
 
-# CAD_Xpert <- rbind(MDF.CAD4TBv7, Young.age.CAD4TBv7, Middle.age.CAD4TBv7, Old.age.CAD4TBv7, HIVp.CAD4TBv7, HIVn.CAD4TBv7, Prior.CAD4TBv7, New.CAD4TBv7, Female.CAD4TBv7, Male.CAD4TBv7, Smoker.CAD4TBv7, NonSmoker.CAD4TBv7, Symptomatic.CAD4TBv7, NonSymptomatic.CAD4TBv7)
+################ CAD4TBv6 #####################################
+AI.score <- seq(0, 100, by = sep)
+mylist <- NULL
+mylist <- as.list(mylist)
+
+# CAD4TBv6
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$CAD4TBv6, AI.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.CAD4TBv6 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.CAD4TBv6$Subgroup  <- paste("MDF")
+MDF.CAD4TBv6$AI <- paste("CAD4TBv6")
+
+
+################ qXRv2 #####################################
+AI.score <- seq(0, 100, by = sep)
+mylist <- NULL
+mylist <- as.list(mylist)
+
+# qXRv2
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$qXRv2, AI.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.qXRv2 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.qXRv2$Subgroup  <- paste("MDF")
+MDF.qXRv2$AI <- paste("qXRv2")
+
+
+################ qXRv3 #####################################
+AI.score <- seq(0, 100, by = sep)
+mylist <- NULL
+mylist <- as.list(mylist)
+
+# qXRv3
+for (i in 1 : maxV){
+  cutoff.accuracy <- myfunction(MDF, MDF$qXRv3, AI.score[i])
+  mylist[[i]] <- list(cutoff.accuracy)
+}
+MDF.qXRv3 <- data.frame(matrix(unlist(mylist), nrow=maxV, byrow=T))
+MDF.qXRv3$Subgroup  <- paste("MDF")
+MDF.qXRv3$AI <- paste("qXRv3")
+
+
+######### Merge DFs ######
+CAD_Xpert <- rbind(MDF.CAD4TBv7, MDF.CAD4TBv6, MDF.qXRv2, MDF.qXRv3)
+
 
 colnames(CAD_Xpert)[1] <- "Score"
 colnames(CAD_Xpert)[2] <- "Sens"
@@ -62,7 +106,6 @@ colnames(CAD_Xpert)[6] <- "Spec_L"
 colnames(CAD_Xpert)[7] <- "Spec_H"
 colnames(CAD_Xpert)[8] <- "CAD_Pos_TB"
 colnames(CAD_Xpert)[9] <- "CAD_Pos_Normal"
-View(CAD_Xpert)
 
 CAD_Xpert$ppv <- (CAD_Xpert$Sens * prev)/(CAD_Xpert$Sens * prev + (1-CAD_Xpert$Spec)*(1-prev))
 CAD_Xpert$npv <- (CAD_Xpert$Spec * (1-prev))/((CAD_Xpert$Spec * (1-prev))+(1-CAD_Xpert$Sens)*prev)
@@ -84,46 +127,55 @@ CAD_Xpert$nnt <- 1/CAD_Xpert$ppv
 CAD_Xpert$AI <- as.character(CAD_Xpert$AI)
 
 #################Save ###############
-write.csv(CAD_Xpert, "09_Results/Reference both/Modelling/Modeling_CAD4TBv7.csv", row.names = F)
+write.csv(CAD_Xpert, "2.0 Version Comparison/Modeling.csv", row.names = F)
+
+
+# qXR ----
+CAD_Xpert <- read_csv("2.0 Version Comparison/Modeling.csv")
+
+CAD_Xpert0 <- CAD_Xpert
+CAD_Xpert <- CAD_Xpert0[CAD_Xpert0$AI %in% c("qXRv2", "qXRv3"), ]
+CAD_Xpert$AI <- as.character(CAD_Xpert$AI)
+
+
+### d. Sensitivity vs Score --------------------
+base <- ggplot(CAD_Xpert, aes(Score, Sens)) + geom_path(aes(color = AI)) + scale_fill_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +  scale_color_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +theme(legend.position = c(0.05,0.15),  legend.justification = c("left", "bottom"))
+
+sensCurveqXR <- base + theme_light() + labs(x = "Abnormality Score", y= "Sensitivity", subtitle = paste0("qXRv2 vs qXRv3: The Sensitivity vs abnormality score (n=", length(MDF$PID_OMRS), ")")) +theme(legend.position = c(5,5),legend.justification = c("left", "bottom")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0, 100, 10))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1)) + geom_vline(xintercept = c(50, 60, 70), linetype="dotted", color = "black", size=1)  
+sensCurveqXR
+
+
+### e. Xpert Saved vs Score --------------------
+base <- ggplot(CAD_Xpert, aes(Score, XpertSaved)) + geom_path(aes(color = AI))  + scale_fill_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +  scale_color_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) 
+
+XpertSavingCurveqXR <- base + theme_light()  + labs(x = "e. Abnormality Score", y= "Xpert Saved", subtitle = paste0("qXRv2 vs qXRv3: The Xpert Saved vs abnormality score (n=", length(MDF$PID_OMRS), ")")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0, 100, 10))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ geom_vline(xintercept = c(50, 60, 70), linetype="dotted", color = "black", size=1) +theme(  legend.position = c(0.05,0.95),  legend.justification = c("left", "top"))
+XpertSavingCurveqXR
+
+
+# CAD4TB ----
+CAD_Xpert <- CAD_Xpert0
+CAD_Xpert <- CAD_Xpert[CAD_Xpert$AI %in% c("CAD4TBv6", "CAD4TBv7"), ]
+CAD_Xpert$AI <- as.character(CAD_Xpert$AI)
 
 
 
-
-### PLOT ######
-### a. Sensitivity vs Score --------------------
-base <- ggplot(CAD_Xpert, aes(Score, Sens)) + geom_path(aes(color = AI))  
+### d. Sensitivity vs Score --------------------
+base <- ggplot(CAD_Xpert, aes(Score, Sens)) + geom_path(aes(color = AI)) + scale_fill_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +  scale_color_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) 
 # + geom_ribbon(aes(x = Score, ymin = Sens_L, ymax = Sens_H, color = AI, fill = AI), alpha= 0.2) 
 
-sensCurve <- base + theme_light() + coord_equal() + labs(x = "Abnormality Score", y= "Sensitivity", subtitle = paste0("a. The Sensitivity vs abnormality score (n=", pop_size, ")"))  + theme(legend.position = "none") + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1)) + geom_vline(xintercept = c(0.5, 0.3, 0.7), linetype="dotted", color = "black", size=1)  +  geom_hline(yintercept = 0.9, linetype="dotted", color = "black", size=1)  
-
-### d. NNT --------------------
-CAD_Xpert$nnt <- 1/CAD_Xpert$ppv
-base <- ggplot(CAD_Xpert, aes(Score, nnt)) + geom_path(aes(color = AI))  
-
-NNTCurve <- base + theme_light()  + labs(x = "Abnormality Score", y= "NNT", subtitle = paste0("d. The NNT vs abnormality score (n=", pop_size, ")")) +theme(legend.position = c(1,1),legend.justification = c("right", "top")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ geom_vline(xintercept = c(0.5, 0.7, 0.3), linetype="dotted", color = "black", size=1) 
-NNTCurve
-# +theme(legend.position = c(0.05,0.95), legend.justification = c("left", "top"))
+sensCurveCAD4TB <- base + theme_light()  + labs(x = "Abnormality Score", y= "Sensitivity", subtitle = paste0("CAD4TBv6 vs CAD4TBv7: The Sensitivity vs abnormality score (n=", length(MDF$PID_OMRS), ")")) +theme(legend.position = c(5,5),legend.justification = c("left", "bottom")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0, 100, 10))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1)) + geom_vline(xintercept = c(50, 60, 70), linetype="dotted", color = "black", size=1)  +theme(legend.position = c(0.05,0.15),  legend.justification = c("left", "bottom"))
 
 
-### b. Xpert Saved vs Score --------------------
-### Xpert saved ----
-base <- ggplot(CAD_Xpert, aes(Score, XpertSaved)) + geom_path(aes(color = AI))  
 
-XpertSavingCurve <- base + theme_light()  + labs(x = "e. Abnormality Score", y= "Xpert Saved",subtitle = paste0("b. The Xpert Saved (n=", pop_size, ")")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.10), breaks = seq(0, 1, 0.10))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ geom_vline(xintercept = c(0.5, 0.6, 0.7), linetype="dotted", color = "black", size=1) +theme(  legend.position = c(0.05,0.95),  legend.justification = c("left", "top"))
+### e. Xpert Saved vs Score --------------------
+base <- ggplot(CAD_Xpert, aes(Score, XpertSaved)) + geom_path(aes(color = AI))  + scale_fill_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) +  scale_color_manual(values=c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00")) 
 
+XpertSavingCurveCAD4TB <- base + theme_light()  + labs(x = "e. Abnormality Score", y= "Xpert Saved", subtitle = paste0("CAD4TBv6 vs CAD4TBv7: The Xpert Saved vs abnormality score (n=", length(MDF$PID_OMRS), ")")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 100, 10), breaks = seq(0, 100, 10))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ geom_vline(xintercept = c(50, 60, 70), linetype="dotted", color = "black", size=1) +theme(legend.position = c(0.05,0.95),  legend.justification = c("left", "top"))
 
-### c. Sens vs Xpert Saved--------------------
-base <- ggplot(CAD_Xpert, aes(XpertSaved, Sens)) + geom_path(aes(color = AI, fill = AI))   
-# + geom_ribbon(aes(x = XpertSaved, ymin = Sens_L, ymax = Sens_H, color = AI, fill = AI), alpha= 0.2) 
-
-XpertSens <- base + theme_light() + coord_equal() + labs(x = "Xpert Saved", y= "Sensitivity", subtitle = paste0("c. The Xpert Saved vs sensitivity (n=", pop_size, ")")) +theme(legend.position = c(0.05,0.05), legend.justification = c("left", "bottom")) + theme(panel.grid.minor = element_line(colour="grey", size=0.5)) + scale_x_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1))+ scale_y_continuous(minor_breaks = seq(0 , 1, 0.1), breaks = seq(0, 1, 0.1)) + geom_vline(xintercept = c(0.5, 0.66, 0.75), linetype="dotted", color =  "black", size=1) + geom_hline(yintercept = c(0.9, 0.7), linetype="dotted", color = "black", size=1)
-XpertSens
 
 
 ### Save --------------------
-
-tiff("09_Results/Reference both/Moduled Curves_CAD4TBv7.tif", width = 10, height = 10, units = "in", res = 150)
+tiff("2.0 Version Comparison/2 Curves.tif", width = 10, height = 10, units = "in", res = 100)
 require(gridExtra)
-grid.arrange(sensCurve, XpertSavingCurve, XpertSens, NNTCurve,  nrow=2)
-# grid.arrange(sensCurve, ggROC, XpertSavingCurve, PRC, NNTCurve, XpertSens, nrow=3)
+grid.arrange(sensCurveqXR, XpertSavingCurveqXR, sensCurveCAD4TB, XpertSavingCurveCAD4TB,  nrow=2)
 dev.off()
