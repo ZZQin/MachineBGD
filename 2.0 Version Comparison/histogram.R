@@ -3,11 +3,42 @@ source("2.0 Version Comparison/radiologist.R")
 table(MDF_long$DeepLearningSystem)
 MDF_long$DeepLearningSystem <- as.character(MDF_long$DeepLearningSystem)
 
+
 # MDF_long$DeepLearningSystem[grep("CAD4TB", MDF_long$DeepLearningSystem)] <- "P1"
 # MDF_long$DeepLearningSystem[grep("qXR", MDF_long$DeepLearningSystem)] <- "P3"
 # MDF_long$DeepLearningSystem[grep("Lunit INSIGHT CXR", MDF_long$DeepLearningSystem)] <- "P2"
 
+### mean of the difference and t-test for paird data
+MDF$diff_cad <- MDF$CAD4TBv7-MDF$CAD4TBv6
+MDF$diff_qXR <- MDF$qXRv3-MDF$qXRv2
+summary(MDF$diff_cad)
+summary(MDF$diff_qXR)
 
+# CAD4TB: Save the data in two different vector
+before <-  MDF$CAD4TBv6
+after <- MDF$CAD4TBv7
+# Compute t-test
+res <- t.test(after, before, paired = TRUE,
+              alternative = "less")
+res
+
+# qXR: Save the data in two different vector
+before <-  MDF$qXRv2
+after <- MDF$qXRv3
+# Compute t-test
+res <- t.test(after, before, paired = TRUE,
+              alternative = "less")
+res
+
+
+#define quantiles of interest
+q = c(.1, .9)
+
+#calculate quantiles by grouping variable
+MDF_long%>%
+  group_by(DeepLearningSystem, GXP.Result) %>%
+  summarize(quant10 = quantile(AbnormalityScore, probs = q[1]), 
+            quant90 = quantile(AbnormalityScore, probs = q[2]))
 
 
 ## Histogram
@@ -18,6 +49,34 @@ hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.pos
 tiff("2.0 Version Comparison//Histogram.tif", width = 14, height = 8, units = "in", res = 100)
 hist
 dev.off()
+
+# facet by AI
+p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..count.., fill = Xpert2Outcome_num)) + xlab("Abnormality Scores of the Deep Learning Systems") 
+hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#91003f", "#a1dab4"))
+hist
+
+# color of different AI
+MDF_long_CAD <- MDF_long[MDF_long$DeepLearningSystem %in% (c("CAD4TBv6", "CAD4TBv7")), ]
+p <- ggplot(MDF_long_CAD,aes(x=AbnormalityScore, fill=DeepLearningSystem,))+ geom_histogram(position = 'identity', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..count.., fill = DeepLearningSystem)) + xlab("Abnormality Scores of the Deep Learning Systems") 
+hist <- p + facet_wrap(~GXP.Result) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#2166ac", "#ef8a62"))
+hist
+
+MDF_long_qXR <- MDF_long[MDF_long$DeepLearningSystem %in% (c("qXRv2", "qXRv3")), ]
+p <- ggplot(MDF_long_qXR,aes(x=AbnormalityScore, fill=DeepLearningSystem,))+ geom_histogram(position = 'identity', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..count.., fill = DeepLearningSystem)) + xlab("Abnormality Scores of the Deep Learning Systems") 
+hist <- p + facet_wrap(~GXP.Result) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#2166ac", "#ef8a62"))
+hist
+
+
+
+
+
+
+
+
+p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=Xpert2Outcome_num,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..count.., fill = Xpert2Outcome_num)) + xlab("Abnormality Scores of the Deep Learning Systems") 
+hist <- p + facet_wrap(~DeepLearningSystem) + theme_minimal() + theme(legend.position = "top") +scale_fill_manual(values=c("#91003f", "#a1dab4"))
+hist
+
 
 ## Density plot
 p <- ggplot(MDF_long,aes(x=AbnormalityScore, fill=XpertHistory,))+ geom_histogram(position = 'stack', alpha=0.5, breaks=seq(0,100, by=5), aes(y = ..density.., fill = XpertHistory)) + xlab("Abnormality Scores of the AI products") 

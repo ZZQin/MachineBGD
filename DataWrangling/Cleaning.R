@@ -26,12 +26,14 @@ Master_df$Xpert2Outcome_num[Master_df$GXP.Result %in% "MTB Detected"] <- "1"
 Master_df$Xpert2Outcome_num[Master_df$GXP.Result %in% "MTB Not Detected"] <- "0"
 Master_df$Xpert2Outcome_num <- as.numeric(Master_df$Xpert2Outcome_num)
 
-Master_df <- Master_df %>%
-  filter(Result.Date < as.Date("2017-01-01"))
+# Master_df <- Master_df %>%
+#   filter(Result.Date < as.Date("2017-01-01"))
 
 SymptomData <- read_excel("DataWrangling/ScreeningData.xlsx")
 
 Master_df <- merge(Master_df, SymptomData, by.x = "PID_OMRS", by.y = "OpenMRS Identification Number", all.x = TRUE)
+
+write.csv(Master_df, "L:/Shared drives/1_Digital Health/1.3. Manuscripts/2.2. Children/BGD Children/00_Input_Data/master_df.csv")
 
 # Delft 6.0.0
 CAD6_delft <- read.table(file = "DataWrangling/CAD_delft_2018.csv", sep = ",", header = T, fill = T)

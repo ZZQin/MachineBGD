@@ -70,3 +70,9 @@ write.csv(T1, "Results/Table 1.csv", row.names = FALSE)
 
 rm(table1.all, table1all, table1allDF, table1, table1DF, tabletype, tabletypeDF, tableType, listVar, catVars)
 
+
+# Subset for Ggoogle
+names(MDF)
+Alan <- MDF[, c(13, 21, 23, 31, 32,  35, 36)]
+summary(Alan)
+write.csv(Alan, "For Alan from UNOPS_STOP_TB.csv", row.names = F)
